@@ -1,0 +1,82 @@
+{
+  "name": "simple-checkout",
+  "author": {
+    "name": "La Crypta",
+    "url": "https://github.com/lacrypta"
+  },
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && prisma migrate deploy && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "exec prettier . --write"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.633.0",
+    "@instantdb/admin": "^0.14.19",
+    "@instantdb/react": "^0.14.19",
+    "@lawallet/react": "^0.2.45",
+    "@prisma/client": "5.19.1",
+    "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
+    "@radix-ui/react-collapsible": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-switch": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "@tanstack/react-table": "^8.20.5",
+    "axios": "^1.7.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "confetti-js": "^0.0.18",
+    "embla-carousel-react": "^8.1.8",
+    "input-otp": "^1.2.4",
+    "lottie-react": "^2.4.0",
+    "lucide-react": "^0.419.0",
+    "next": "14.2.5",
+    "nostr-tools": "npm:@lawallet/nostr-tools@^1.17.0",
+    "prettier": "^3.3.3",
+    "qr-scanner": "^1.4.2",
+    "qrcode.react": "^4.0.1",
+    "react": "^18",
+    "react-canvas-confetti": "^2.0.7",
+    "react-dom": "^18",
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "usehooks-ts": "^3.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "prisma": "^5.19.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@8.14.1",
+  "overrides": {
+    "nostr-tools": "npm:@lawallet/nostr-tools"
+  },
+  "pnpm": {
+    "overrides": {
+      "nostr-tools": "npm:@lawallet/nostr-tools"
+    }
+  }
+}
