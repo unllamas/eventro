@@ -76,11 +76,11 @@ enum OrderStatus {
 
 model Order {
     // Base data
-    reference    String  @unique // for nostr event
     id           String  @id @default(uuid())
+    reference    String  @unique // for nostr event
     amount       Int
-    currency     String
-    zapReceiptId String? @unique
+    currency     String // ej: sat/ars/usd
+    zapReceiptId String? @unique // ??
 
     status OrderStatus
 
@@ -98,7 +98,6 @@ model Order {
 
 enum TicketSaleStatus {
     GENERATED
-    TRANSFERRED
     CHECKIN
 }
 
