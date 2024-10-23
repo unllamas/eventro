@@ -77,7 +77,7 @@ enum OrderStatus {
 model Order {
     // Base data
     id           String  @id @default(uuid())
-    reference    String  @unique // for nostr event
+    reference    String  @unique // for nostr event or other reference
     amount       Int
     currency     String // ej: sat/ars/usd
     zapReceiptId String? @unique // ??
