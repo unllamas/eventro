@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model User {
+    // Base data
+    id       String @id @default(uuid())
+    fullname String
+    email    String @unique
+
+    // Relations
+    orders      Order[]
+    ticketSales TicketSale[]
+
+    // Status
+    createdAt DateTime
+}
+
+enum EventStatus {
+    ACTIVE
+    CANCEL
+}
+
+model Event {
+    // Base data
+    id          String   @id @default(uuid())
+    image       String?
+    title       String
+    description String?
+    start       DateTime
+    end         DateTime
+    location    String?
+
+    // Relations
+    ticketTypes TicketType[]
+    orders      Order[]
+
+    // Status
+    status    EventStatus
+    createdAt DateTime
+    updatedAt DateTime
+}
+
+model TicketType {
+    // Base data
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+    amount      Int
+    currency    String
+    quantity    Int
+
+    // Relations
+    eventId     String
+    event       Event        @relation(fields: [eventId], references: [id])
+    ticketSales TicketSale[]
+
+    // Status
+    createdAt DateTime
+    updatedAt DateTime
+}
+
+enum OrderStatus {
+    GENERATED
+    PAID
+}
+
+model Order {
+    // Base data
+    reference    String  @unique // for nostr event
+    id           String  @id @default(uuid())
+    amount       Int
+    currency     String
+    zapReceiptId String? @unique
+
+    status OrderStatus
+
+    // Relations
+    userId      String
+    user        User         @relation(fields: [userId], references: [id])
+    eventId     String
+    event       Event        @relation(fields: [eventId], references: [id])
+    ticketSales TicketSale[]
+
+    // Status
+    createdAt DateTime
+    updatedAt DateTime
+}
+
+enum TicketSaleStatus {
+    GENERATED
+    TRANSFERRED
+    CHECKIN
+}
+
+model TicketSale {
+    // Base data
+    id   String @id @default(uuid())
+    code String @unique
+
+    // Relations
+    userId       String
+    user         User       @relation(fields: [userId], references: [id])
+    orderId      String
+    order        Order      @relation(fields: [orderId], references: [id])
+    ticketTypeId String
+    ticketType   TicketType @relation(fields: [ticketTypeId], references: [id])
+
+    // Status
+    status    TicketSaleStatus
+    createdAt DateTime
+}
+
+// model Code {
+//     id       String  @id @default(uuid())
+//     code     String  @unique
+//     comment  String?
+//     discount Int
+//     used     Int     @default(0)
+// }
