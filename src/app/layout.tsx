@@ -11,8 +11,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'Ticketing - La Crypta',
-  description: 'Ticketing para eventos de La Crypta',
+  title: 'Eventro',
+  description: "Create unforgettable events, we'll take care of the rest.",
 };
 
 export default function RootLayout({
