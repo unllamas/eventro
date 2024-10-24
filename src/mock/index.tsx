@@ -223,23 +223,21 @@ export const FEATURES_MOCK = [
   {
     id: 1,
     title: 'Customizable',
-    description:
-      'Tailor the purchasing experience to your unique brand and style.',
+    description: 'Tailor the experience to your brand and style.',
   },
   {
     id: 2,
     title: 'Smart',
-    description: 'Save time and reduce errors with automated processes.',
+    description: 'Save time and reduce errors.',
   },
   {
     id: 3,
     title: 'Bitcoin Payments',
-    description:
-      'Offer innovative and secure payment options to your attendees.',
+    description: 'Offers innovative and international payments.',
   },
   {
     id: 4,
     title: 'Simplified Management',
-    description: 'Easily manage different types of tickets for each event.',
+    description: 'Easily manage different types of moderator posts.',
   },
 ];
