@@ -1,6 +1,5 @@
 import Image from 'next/image';
 
-import { Logo } from '@/components/logo';
 import { Card, CardContent } from '@/components/ui/card';
 import { FEATURES_MOCK } from '@/mock';
 
@@ -22,16 +21,16 @@ export default function Page() {
             {/* <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
               ...
             </h1> */}
-            <p className="text-xl md:text-2xl text-white/70">
-              Create unforgettable events, we'll take care of the rest.
-            </p>
+            <h1 className="text-xl md:text-2xl text-white/70">
+              Create unforgettable events, we&apos;ll take care of the rest.
+            </h1>
           </div>
         </main>
 
         <div className="grid gap-2 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {FEATURES_MOCK?.map((feature) => (
             <div className="px-2 max-w-[240px] text-center" key={feature.id}>
-              <h3 className="text-md font-semibold mb-2">{feature.title}</h3>
+              <h2 className="text-md font-semibold mb-2">{feature.title}</h2>
               <p className="text-sm text-muted-foreground">
                 {feature.description}
               </p>
