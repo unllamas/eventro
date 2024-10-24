@@ -5,7 +5,7 @@ import { FEATURES_MOCK } from '@/mock';
 
 export default function Page() {
   return (
-    <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen">
+    <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen bg-gradient-to-tl from-[#292929] to-[#0A0A0A]">
       <div className="flex-1 flex flex-col justify-center items-center gap-4">
         <main className="flex flex-col gap-8 w-full max-w-[960px] h-full mx-auto px-4 py-8">
           <div className="flex flex-col items-center gap-4 text-center max-w-2xl mx-auto">
@@ -39,24 +39,24 @@ export default function Page() {
         </div>
       </div>
       <div className="flex items-end justify-center px-4">
-        <div className="flex flex-col items-center">
-          <ArrowCheckIn className="-mb-6 ml-16" />
+        <div className="relative -mr-24 flex flex-col justify-center items-center">
+          <ArrowCheckIn className="-mb-4" />
           <Image
-            className="z-0 -mr-20 max-w-[200px] md:max-w-[300px]"
+            className="relative z-0 min-w-[200px] md:max-w-[300px]"
             src="/screens/checkin.png"
             alt="Checkin Eventro"
-            width={434}
-            height={346}
+            width={513}
+            height={439}
           />
         </div>
         <div className="flex flex-col items-center">
-          <ArrowCheckOut className="-mb-6 mr-16" />
+          <ArrowCheckOut className="-mb-4" />
           <Image
-            className="relative z-10 max-w-[200px] md:max-w-[300px]"
+            className="relative z-10 min-w-[200px] md:max-w-[300px]"
             src="/screens/checkout.png"
             alt="Checkout Eventro"
-            width={434}
-            height={545}
+            width={513}
+            height={548}
           />
         </div>
       </div>
