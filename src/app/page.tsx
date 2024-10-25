@@ -1,15 +1,53 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { LoginDialog } from '@/components/login-dialog';
+import { useToast } from '@/hooks/use-toast';
 
-import { db } from '@/config/db';
+import { JoinWaitlist } from '@/components/join-wailist';
+
 import { FEATURES_MOCK } from '@/mock';
 
 export default function Page() {
-  const { user } = db.useAuth();
+  const hasWaitlist = localStorage.getItem('whitelist') === 'true';
+
+  const { toast } = useToast();
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (pubkey: string) => {
+    if (!pubkey) return null;
+    setLoading(true);
+
+    const response = await fetch('/api/whitelist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ pubkey }),
+    });
+
+    if (!response.ok) {
+      setLoading(false);
+      toast({
+        variant: 'destructive',
+        title: 'Oops...',
+        description: 'The pubkey entered already exists :)',
+        duration: 2400,
+      });
+
+      return null;
+    } else {
+      toast({
+        title: 'Thank you!',
+        description: 'You will hear from us soon :)',
+        duration: 4800,
+      });
+
+      localStorage.setItem('whitelist', 'true');
+    }
+  };
 
   return (
     <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen bg-gradient-to-tl from-[#292929] to-[#0A0A0A]">
@@ -31,7 +69,13 @@ export default function Page() {
             <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
             </h1>
-            {!user && <LoginDialog label="Sign me up for the beta" />}
+            {!hasWaitlist && (
+              <JoinWaitlist
+                label="Sign me up for the beta"
+                onSubmit={handleSubmit}
+                loading={loading}
+              />
+            )}
           </div>
         </main>
 
