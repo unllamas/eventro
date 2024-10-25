@@ -10,11 +10,12 @@ import { JoinWaitlist } from '@/components/join-wailist';
 import { FEATURES_MOCK } from '@/mock';
 
 export default function Page() {
-  const hasWaitlist = localStorage.getItem('whitelist') === 'true';
+  // const hasWaitlist = localStorage.getItem('whitelist') === 'true';
 
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
+  const [submit, setSubmit] = useState(false);
 
   const handleSubmit = async (pubkey: string) => {
     if (!pubkey) return null;
@@ -39,13 +40,13 @@ export default function Page() {
 
       return null;
     } else {
+      setSubmit(true);
+      setLoading(false);
       toast({
         title: 'Thank you!',
         description: 'You will hear from us soon :)',
         duration: 4800,
       });
-
-      localStorage.setItem('whitelist', 'true');
     }
   };
 
@@ -69,7 +70,7 @@ export default function Page() {
             <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
             </h1>
-            {!hasWaitlist && (
+            {!submit && (
               <JoinWaitlist
                 label="Sign me up for the beta"
                 onSubmit={handleSubmit}
