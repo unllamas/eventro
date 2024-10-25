@@ -11,8 +11,8 @@
     /* Components */
     --border: 0 4% 15%;
     /* Brand */
-    --primary: 141 78% 65%;
-    --primary-foreground: 141 78% 9%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 100% 0%;
     --secondary: 0 2% 23%;
     --secondary-foreground: 141 78% 95%;
     /* Validations */

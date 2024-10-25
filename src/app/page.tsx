@@ -1,9 +1,16 @@
+'use client';
+
 import Image from 'next/image';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { LoginDialog } from '@/components/login-dialog';
+
+import { db } from '@/config/db';
 import { FEATURES_MOCK } from '@/mock';
 
 export default function Page() {
+  const { user } = db.useAuth();
+
   return (
     <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen bg-gradient-to-tl from-[#292929] to-[#0A0A0A]">
       <div className="flex-1 flex flex-col justify-center items-center gap-4">
@@ -24,12 +31,19 @@ export default function Page() {
             <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
             </h1>
+            {!user && <LoginDialog label="Sign me up for the beta" />}
           </div>
         </main>
 
         <div className="grid gap-2 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {FEATURES_MOCK?.map((feature) => (
-            <div className="px-2 max-w-[240px] text-center" key={feature.id}>
+            <div
+              className="flex flex-col items-center px-2 max-w-[240px] text-center"
+              key={feature.id}
+            >
+              {feature.icon && (
+                <feature.icon className="h-8 w-8 mb-4 text-primary" />
+              )}
               <h2 className="text-md font-semibold mb-2">{feature.title}</h2>
               <p className="text-sm text-muted-foreground">
                 {feature.description}
