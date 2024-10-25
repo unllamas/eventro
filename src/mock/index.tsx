@@ -1,9 +1,4 @@
-import {
-  Bitcoin,
-  Paintbrush,
-  ScanSearch,
-  SquareChartGantt,
-} from 'lucide-react';
+import { Bitcoin, Paintbrush, SquareChartGantt, Waypoints } from 'lucide-react';
 
 export const EVENT_MOCK = {
   id: 'event_1',
@@ -235,7 +230,7 @@ export const FEATURES_MOCK = [
   },
   {
     id: 2,
-    icon: ScanSearch,
+    icon: Waypoints,
     title: 'Nostr Integration',
     description: 'Empower your events with decentralized.',
   },
