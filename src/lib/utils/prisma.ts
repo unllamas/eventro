@@ -1,4 +1,4 @@
-import { Order, Ticket, User } from '@prisma/client';
+// import { Order, Ticket, User } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { Event } from 'nostr-tools';
 import { prisma } from '@/services/prismaClient';
@@ -8,7 +8,7 @@ export interface CreateOrderResponse {
 }
 
 export interface UpdatePaidOrderResponse {
-  tickets: Ticket[];
+  tickets: [];
   alreadyPaid: boolean;
 }
 
@@ -30,32 +30,32 @@ async function createOrder(
 ): Promise<CreateOrderResponse> {
   const eventReferenceId: string = randomBytes(32).toString('hex');
 
-  const { order, user } = await prisma.$transaction(async () => {
-    // Create or update user
-    const user: User | null = await prisma.user.upsert({
-      where: {
-        email,
-      },
-      update: {},
-      create: { fullname, email },
-    });
+  // const { order, user } = await prisma.$transaction(async () => {
+  //   // Create or update user
+  //   // const user: User | null = await prisma.user.upsert({
+  //   //   where: {
+  //   //     email,
+  //   //   },
+  //   //   update: {},
+  //   //   create: { fullname, email },
+  //   // });
 
-    // Create order
-    const order: Order | null = await prisma.order.create({
-      data: {
-        eventReferenceId,
-        ticketQuantity,
-        totalMiliSats,
-        userId: user.id,
-      },
-    });
+  //   // Create order
+  //   // const order: Order | null = await prisma.order.create({
+  //   //   data: {
+  //   //     eventReferenceId,
+  //   //     ticketQuantity,
+  //   //     totalMiliSats,
+  //   //     userId: user.id,
+  //   //   },
+  //   // });
 
-    return { order, user };
-  });
+  //   return { order, user };
+  // });
 
-  if (!order || !user) {
-    throw new Error('Order or user not created');
-  }
+  // if (!order || !user) {
+  //   throw new Error('Order or user not created');
+  // }
 
   const response: CreateOrderResponse = {
     eventReferenceId,
@@ -69,81 +69,82 @@ async function updatePaidOrder(
   email: string,
   zapReceipt: Event,
   code: string | null
-): Promise<UpdatePaidOrderResponse> {
+): Promise<UpdatePaidOrderResponse | null> {
   const eventReferenceId = zapReceipt.tags.find((tag) => tag[0] === 'e')![1];
 
-  const { order, user, tickets, alreadyPaid } = await prisma.$transaction(
-    async () => {
-      // Check if order is already paid
-      const existingOrder = await prisma.order.findUnique({
-        where: { eventReferenceId },
-        select: { paid: true },
-      });
+  // const { order, user, tickets, alreadyPaid } = await prisma.$transaction(
+  //   async () => {
+  //     // Check if order is already paid
+  //     // const existingOrder = await prisma.order.findUnique({
+  //     //   where: { eventReferenceId },
+  //     //   select: { paid: true },
+  //     // });
 
-      if (existingOrder?.paid) {
-        return { order: null, user: null, tickets: [], alreadyPaid: true };
-      }
+  //     // if (existingOrder?.paid) {
+  //     //   return { order: null, user: null, tickets: [], alreadyPaid: true };
+  //     // }
 
-      // Update order to paid
-      const order: Order | null = await prisma.order.update({
-        where: { eventReferenceId },
-        data: {
-          paid: true,
-          zapReceiptId: zapReceipt.id,
-        },
-      });
+  //     // Update order to paid
+  //     // const order: Order | null = await prisma.order.update({
+  //     //   where: { eventReferenceId },
+  //     //   data: {
+  //     //     paid: true,
+  //     //     zapReceiptId: zapReceipt.id,
+  //     //   },
+  //     // });
 
-      // Update the user in case their name changes
-      const user: User | null = await prisma.user.update({
-        where: { email },
-        data: { fullname },
-      });
+  //     // Update the user in case their name changes
+  //     // const user: User | null = await prisma.user.update({
+  //     //   where: { email },
+  //     //   data: { fullname },
+  //     // });
 
-      if (code) {
-        await prisma.code.update({
-          where: { code },
-          data: {
-            used: {
-              increment: 1,
-            },
-          },
-        });
-      }
+  //     // if (code) {
+  //     //   await prisma.code.update({
+  //     //     where: { code },
+  //     //     data: {
+  //     //       used: {
+  //     //         increment: 1,
+  //     //       },
+  //     //     },
+  //     //   });
+  //     // }
 
-      if (!order || !user) {
-        throw new Error('Order or user not found, cannot create ticket');
-      }
+  //     // if (!order || !user) {
+  //     //   throw new Error('Order or user not found, cannot create ticket');
+  //     // }
 
-      // Create tickets
-      let tickets: Ticket[] = [];
+  //     // Create tickets
+  //     let tickets: Ticket[] = [];
 
-      for (let i = 0; i < order.ticketQuantity; i++) {
-        const ticketId: string = randomBytes(16).toString('hex');
+  //     // for (let i = 0; i < order.ticketQuantity; i++) {
+  //     //   const ticketId: string = randomBytes(16).toString('hex');
 
-        const ticket: Ticket | null = await prisma.ticket.create({
-          data: {
-            ticketId,
-            userId: user.id,
-            orderId: order.id,
-          },
-        });
+  //     //   const ticket: Ticket | null = await prisma.ticket.create({
+  //     //     data: {
+  //     //       ticketId,
+  //     //       userId: user.id,
+  //     //       orderId: order.id,
+  //     //     },
+  //     //   });
 
-        tickets.push(ticket);
-      }
+  //     //   tickets.push(ticket);
+  //     // }
 
-      return { order, user, tickets, alreadyPaid: false };
-    }
-  );
+  //     // return { order, user, tickets, alreadyPaid: false };
+  //   }
+  // );
 
-  if (alreadyPaid) {
-    return { tickets: [], alreadyPaid };
-  }
+  // if (alreadyPaid) {
+  //   return { tickets: [], alreadyPaid };
+  // }
 
-  if (!order || !user || tickets.length === 0) {
-    throw new Error('Order or user not found or ticket not created');
-  }
+  // if (!order || !user || tickets.length === 0) {
+  //   throw new Error('Order or user not found or ticket not created');
+  // }
 
-  return { tickets, alreadyPaid };
+  // return { tickets, alreadyPaid };
+  return null;
 }
 
 async function checkInTicket(ticketId: string): Promise<CheckInTicketResponse> {
@@ -151,38 +152,38 @@ async function checkInTicket(ticketId: string): Promise<CheckInTicketResponse> {
     // To Do: optimize this query with conditional update
     async () => {
       // Find ticket
-      const ticket: Ticket | null = await prisma.ticket.findUnique({
-        where: {
-          ticketId,
-        },
-      });
+      // const ticket: Ticket | null = await prisma.ticket.findUnique({
+      //   where: {
+      //     ticketId,
+      //   },
+      // });
 
-      if (!ticket) {
-        throw new Error('Ticket not found');
-      }
+      // if (!ticket) {
+      //   throw new Error('Ticket not found');
+      // }
 
       // Check if ticket is already checked in
       let alreadyCheckedIn = false;
 
-      if (ticket.checkIn) {
-        alreadyCheckedIn = true;
+      // if (ticket.checkIn) {
+      //   alreadyCheckedIn = true;
 
-        return { alreadyCheckedIn, checkIn: true };
-      }
+      //   return { alreadyCheckedIn, checkIn: true };
+      // }
 
       // Update ticket to checked in
-      const ticketChecked: Ticket = await prisma.ticket.update({
-        where: {
-          ticketId,
-        },
-        data: {
-          checkIn: true,
-        },
-      });
+      // const ticketChecked: Ticket = await prisma.ticket.update({
+      //   where: {
+      //     ticketId,
+      //   },
+      //   data: {
+      //     checkIn: true,
+      //   },
+      // });
 
-      if (!ticketChecked) {
-        throw new Error('Error checking in ticket');
-      }
+      // if (!ticketChecked) {
+      //   throw new Error('Error checking in ticket');
+      // }
 
       return { alreadyCheckedIn: false, checkIn: true };
     }
@@ -208,33 +209,33 @@ async function createInvite(
       for (const [fullname, email] of list) {
         console.log(fullname, email);
         // Create user
-        const user = await prisma.user.upsert({
-          where: {
-            email,
-          },
-          update: {
-            fullname,
-          },
-          create: {
-            fullname,
-            email,
-          },
-        });
+        // const user = await prisma.user.upsert({
+        //   where: {
+        //     email,
+        //   },
+        //   update: {
+        //     fullname,
+        //   },
+        //   create: {
+        //     fullname,
+        //     email,
+        //   },
+        // });
 
-        console.log(user);
+        // console.log(user);
 
         // Create ticket for the user
         const ticketId: string = randomBytes(16).toString('hex');
 
-        const ticket: Ticket = await prisma.ticket.create({
-          data: {
-            ticketId,
-            userId: user.id,
-            orderId: null,
-          },
-        });
+        // const ticket: Ticket = await prisma.ticket.create({
+        //   data: {
+        //     ticketId,
+        //     userId: user.id,
+        //     orderId: null,
+        //   },
+        // });
 
-        ticketList.push([user.email, ticket.ticketId!]);
+        // ticketList.push([user.email, ticket.ticketId!]);
       }
     } else if (action === 'remove') {
       // TODO: Implement this
@@ -274,9 +275,9 @@ async function createInvite(
 }
 
 // Function to count total tickets in the database
-async function countTotalTickets(): Promise<number> {
-  const count = await prisma.ticket.count();
-  return count;
+async function countTotalTickets(): Promise<number | null> {
+  // const count = await prisma.ticket.count();
+  return null;
 }
 
 export {

@@ -5,13 +5,13 @@ export async function getCodeDiscountBack(_code: string): Promise<number> {
     return 1;
   }
 
-  const code = await prisma.code.findUnique({
-    where: { code: _code },
-  });
+  // const code = await prisma.code.findUnique({
+  //   where: { code: _code },
+  // });
 
-  if (code) {
-    return (100 - code.discount) / 100;
-  }
+  // if (code) {
+  //   return (100 - code.discount) / 100;
+  // }
 
   return 1;
 }
