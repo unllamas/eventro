@@ -45,7 +45,7 @@ export function JoinWaitlist(props: {
         <div className="flex flex-col gap-2 w-full">
           <Label htmlFor="title">Nostr</Label>
           <Input
-            placeholder="Pubkey"
+            placeholder="Npub..."
             type="text"
             value={pubkey as string}
             onChange={(e) => setPubkey(e.target.value)}

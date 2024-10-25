@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { nip19 } from 'nostr-tools';
 
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,33 +19,53 @@ export default function Page() {
   const [submit, setSubmit] = useState(false);
 
   const handleSubmit = async (pubkey: string) => {
-    if (!pubkey) return null;
     setLoading(true);
-
-    const response = await fetch('/api/whitelist', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ pubkey }),
-    });
-
-    if (!response.ok) {
+    if (!pubkey || !pubkey.startsWith('npub')) {
       setLoading(false);
       toast({
         variant: 'destructive',
         title: 'Oops...',
-        description: 'The pubkey entered already exists :)',
+        description: 'The public key is incorrect.',
         duration: 2400,
       });
+    }
 
-      return null;
-    } else {
-      setSubmit(true);
+    try {
+      const { data } = nip19.decode(pubkey);
+
+      const response = await fetch('/api/whitelist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pubkey: data }),
+      });
+
+      if (!response.ok) {
+        setLoading(false);
+        toast({
+          variant: 'destructive',
+          title: 'Oops...',
+          description: 'The pubkey entered already exists.',
+          duration: 2400,
+        });
+
+        return null;
+      } else {
+        setSubmit(true);
+        setLoading(false);
+        toast({
+          title: 'Thank you!',
+          description: 'You will hear from us soon :)',
+          duration: 4800,
+        });
+      }
+    } catch (error: any) {
       setLoading(false);
       toast({
-        title: 'Thank you!',
-        description: 'You will hear from us soon :)',
+        variant: 'destructive',
+        title: 'Oops...',
+        description: error?.message as string,
         duration: 4800,
       });
     }
