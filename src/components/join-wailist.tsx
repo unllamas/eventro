@@ -42,17 +42,17 @@ export function JoinWaitlist(props: {
             Please log in to register for a beta.
           </DialogDescription>
         </DialogHeader>
+        <div className="flex flex-col gap-2 w-full">
+          <Label htmlFor="title">Nostr</Label>
+          <Input
+            placeholder="NIP-05 or pubkey"
+            type="text"
+            value={pubkey as string}
+            onChange={(e) => setPubkey(e.target.value)}
+          />
+        </div>
         <DialogFooter className="flex flex-col">
           <div className="flex flex-col w-full gap-4">
-            <div className="flex flex-col gap-2 w-full">
-              <Label htmlFor="title">Nostr</Label>
-              <Input
-                placeholder="NIP-05 or pubkey"
-                type="text"
-                value={pubkey as string}
-                onChange={(e) => setPubkey(e.target.value)}
-              />
-            </div>
             <Button
               className="w-full"
               size="lg"
