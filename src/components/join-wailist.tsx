@@ -39,13 +39,13 @@ export function JoinWaitlist(props: {
             Welcome to Eventro
           </DialogTitle>
           <DialogDescription className="text-white">
-            Please log in to register for a beta.
+            Please share with us a Nostr account you would like to access.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2 w-full">
           <Label htmlFor="title">Nostr</Label>
           <Input
-            placeholder="NIP-05 or pubkey"
+            placeholder="Pubkey"
             type="text"
             value={pubkey as string}
             onChange={(e) => setPubkey(e.target.value)}
