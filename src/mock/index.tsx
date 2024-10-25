@@ -1,3 +1,10 @@
+import {
+  Bitcoin,
+  Paintbrush,
+  ScanSearch,
+  SquareChartGantt,
+} from 'lucide-react';
+
 export const EVENT_MOCK = {
   id: 'event_1',
   image:
@@ -222,21 +229,25 @@ export const ORDERS_MOCK = [
 export const FEATURES_MOCK = [
   {
     id: 1,
+    icon: Paintbrush,
     title: 'Customizable',
     description: 'Tailor the experience to your brand and style.',
   },
   {
     id: 2,
-    title: 'Smart',
-    description: 'Save time and reduce errors.',
+    icon: ScanSearch,
+    title: 'Nostr Integration',
+    description: 'Empower your events with decentralized.',
   },
   {
     id: 3,
+    icon: Bitcoin,
     title: 'Bitcoin Payments',
     description: 'Offers innovative and international payments.',
   },
   {
     id: 4,
+    icon: SquareChartGantt,
     title: 'Simplified Management',
     description: 'Easily manage different types of moderator posts.',
   },
