@@ -39,6 +39,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-function createWhiteList(pubkey: any) {
-  throw new Error('Function not implemented.');
-}

@@ -1,12 +1,23 @@
 import Link from 'next/link';
+// import Image from 'next/image';
 
 export function Navbar() {
   return (
     <nav className="w-full h-[60px]">
       <div className="flex gap-2 px-4 w-full max-w-[520px] h-full items-center justify-between mx-auto">
         <Link href="/" className="w-auto">
+          {/* <div className="max-w-[200px]">
+            <Image
+              className="w-full"
+              src="/logo.png"
+              alt="Eventro logo"
+              width={280}
+              height={60}
+              quality={100}
+              priority
+            />
+          </div> */}
           <LaCryptaIso className="w-auto h-[30px]" />
-          {/* <img src='https://placehold.co/120x50' alt='' width={120} height={50} /> */}
         </Link>
         {/* <div className='h-full flex items-center gap-2 ml-4'>
                 <Select defaultValue='SAT'>

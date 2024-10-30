@@ -14,6 +14,9 @@ const nextConfig = {
 
     // New DB
     INSTANT_DB: process.env.INSTANT_DB_APP_ID,
+
+    // System
+    FEE_VALUE: process.env.FEE_VALUE_NUMBER,
   },
   images: {
     remotePatterns: [

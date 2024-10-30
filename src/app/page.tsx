@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { JoinWaitlist } from '@/components/join-wailist';
 
 import { FEATURES_MOCK } from '@/mock';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Page() {
   // const hasWaitlist = localStorage.getItem('whitelist') === 'true';
@@ -91,13 +93,17 @@ export default function Page() {
             <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
             </h1>
-            {!submit && (
+            {/* {!submit ? (
               <JoinWaitlist
                 label="Sign me up for the beta"
                 onSubmit={handleSubmit}
                 loading={loading}
               />
-            )}
+            ) : ( */}
+            <Button asChild>
+              <Link href="/dash">Go to dashboard</Link>
+            </Button>
+            {/* )} */}
           </div>
         </main>
 

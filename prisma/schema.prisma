@@ -2,20 +2,111 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Whitelist {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    pubkey String @unique
+  pubkey String @unique
 
-    // Status
-    createdAt DateTime @default(now())
+  // Status
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id     String  @id @default(uuid())
+  name   String?
+  email  String? @unique
+  pubkey String? @unique
+
+  // Relations
+  Orders     Order[]
+  TicketSale TicketSale[]
+
+  // Status
+  createdAt DateTime? @default(now())
+}
+
+model Event {
+  // Base data
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  start       String
+  pubkey      String
+  nostrId     String  @unique // for nostr event
+
+  // Relations
+  Tickets Ticket[]
+  Orders  Order[]
+  Sales   TicketSale[]
+
+  // Status
+  status    String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @default(now())
+}
+
+model Ticket {
+  // Base data
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  amount      Int
+  currency    String
+  quantity    Int
+
+  // Relations
+  eventId String
+  Event   Event  @relation(fields: [eventId], references: [id])
+
+  // Status
+  status    String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @default(now())
+}
+
+model Order {
+  id       String  @id @default(uuid())
+  quantity Int
+  amount   Int
+  paid     Boolean @default(false)
+
+  // Relations
+  Sales TicketSale[]
+
+  userId  String
+  User    User   @relation(fields: [userId], references: [id])
+  eventId String
+  Event   Event  @relation(fields: [eventId], references: [id])
+
+  // Status
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+model TicketSale {
+  id        String   @id @default(uuid())
+  reference String   @unique // for check in
+  bolt11    String
+  checkIn   Boolean? @default(false)
+
+  // Relations
+  userId  String
+  User    User   @relation(fields: [userId], references: [id])
+  orderId String
+  Order   Order  @relation(fields: [orderId], references: [id])
+  eventId String
+  Event   Event  @relation(fields: [eventId], references: [id])
+
+  // Status
+  updatedAt DateTime  @default(now())
+  createdAt DateTime? @default(now())
 }

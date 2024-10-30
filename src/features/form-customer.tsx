@@ -1,47 +1,56 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { OrderUserData } from '@/types/orders';
-import { CircleCheck, CircleDashed, CircleX } from 'lucide-react';
 
 const MAX_TICKETS = parseInt(process.env.NEXT_MAX_TICKETS || '0', 10); // Get the max tickets from env
 
 interface FormCustomerProps {
-  onSubmit: (data: OrderUserData) => void;
-  // discountMultiple: number;
-  // isCodeLoading: boolean;
-  // setCode: (code: string) => void;
+  onSubmit: (data: { name: string; email: string; pubkey: string }) => void;
+  loading: boolean;
+  eventId: string;
 }
 
 export function FormCustomer({
   onSubmit,
-  // discountMultiple,
-  // isCodeLoading,
-  // setCode,
+  loading,
+  eventId,
 }: FormCustomerProps) {
   // Form
-  const [fullname, setFullname] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [newsletter, setNewsletter] = useState<boolean>(true);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState<boolean>(false);
-  // const [codeStatus, setCodeStatus] = useState<string>(''); // 'valid', 'invalid', or 'loading'
   const [maxTicketsReached, setMaxTicketsReached] = useState<boolean>(false);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    // setLoading(true);
+
+    // Insert data if not exist
+    const data = {
+      name,
+      email,
+      pubkey: '',
+    };
+
+    const status = 200;
+
+    if (status && status === 200) {
+      console.log('data', data);
+      onSubmit(data);
+    } else {
+      setMessage('Hubo un error al registrar el cliente.');
+      // setLoading(false);
+    }
+  };
 
   // Check total tickets in the database on component mount
   useEffect(() => {
     const checkTickets = async () => {
       try {
-        const response = await fetch('/api/ticket/count', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await fetch(`/api/ticket/count?id=${eventId}`);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -65,42 +74,13 @@ export function FormCustomer({
     checkTickets();
   }, []);
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    setLoading(true);
-
-    // Insert data if not exist
-    const data = {
-      fullname,
-      email,
-      newsletter,
-    };
-
-    const status = 200;
-
-    if (status && status === 200) {
-      onSubmit(data);
-    } else {
-      setMessage('Hubo un error al registrar el cliente.');
-      setLoading(false);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (isCodeLoading) {
-  //     setCodeStatus('loading');
-  //   } else {
-  //     setCodeStatus(discountMultiple != 1 ? 'valid' : 'invalid');
-  //   }
-  // }, [isCodeLoading, discountMultiple]);
-
   return (
     <>
       <div className="flex-1 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="font-bold text-2xl">Information</h2>
           <p className="text-text">
-            Completá la información para recibir tu entrada.
+            Please complete the information to receive your ticket.
           </p>
         </div>
         <Card className="p-6">
@@ -111,13 +91,13 @@ export function FormCustomer({
                   <Label htmlFor="name">Name</Label>
                   <Input
                     type="text"
-                    id="fullname"
-                    name="fullname"
+                    id="name"
+                    name="name"
                     minLength={3}
                     placeholder="Your alias"
                     required
-                    onChange={(e) => setFullname(e.target.value)}
-                    defaultValue={fullname}
+                    onChange={(e) => setName(e.target.value)}
+                    defaultValue={name}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -165,7 +145,7 @@ export function FormCustomer({
                     </div>
                   </div>
                 </div> */}
-                <div className="items-top flex space-x-2 mt-2">
+                {/* <div className="items-top flex space-x-2 mt-2">
                   <Checkbox
                     id="newsletter"
                     onCheckedChange={() => setNewsletter(!newsletter)}
@@ -182,10 +162,10 @@ export function FormCustomer({
                       You agree to our Terms of Service and Privacy Policy.
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
               <Button type="submit" disabled={loading || maxTicketsReached}>
-                {loading ? 'Generando ticket' : 'Confirm order'}
+                {loading ? 'Loading...' : 'Confirm order'}
               </Button>
             </form>
             {message && <p className="text-center text-sm mt-2">{message}</p>}
