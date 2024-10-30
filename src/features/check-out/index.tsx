@@ -166,7 +166,7 @@ export function CheckOut(props: any) {
     email: string;
     pubkey: string;
   }) => {
-    if ((!data?.email && !data?.name) || !data?.pubkey) return null;
+    if ((!data?.email || !data?.name) && !data?.pubkey) return null;
 
     if (ticket?.quantity - ticketsSales === 0) {
       toast({
@@ -284,83 +284,86 @@ export function CheckOut(props: any) {
                         </p>
                       )}
                     </div>
-                    <Card className="p-4 bg-background">
-                      <div className="flex justify-between items-center gap-4">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-md">{ticket?.title}</h2>
-                            {ticket?.quantity - ticketsSales < 4 && (
-                              <Badge variant="destructive">
-                                {ticket?.quantity - ticketsSales} left
-                              </Badge>
-                            )}
-                          </div>
-                          {ticket?.amount === 0 ? (
-                            <p className="flex items-center gap-1 font-semibold text-lg">
-                              Free
-                            </p>
-                          ) : (
-                            <div className="flex items-center gap-1">
-                              <div className="w-6 h-6 text-muted-foreground">
-                                <SatoshiIcon />
+                    {ticketsSales !== ticket?.quantity && (
+                      <>
+                        <Card className="p-4 bg-background">
+                          <div className="flex justify-between items-center gap-4">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h2 className="text-md">{ticket?.title}</h2>
+                                {ticket?.quantity - ticketsSales < 4 && (
+                                  <Badge variant="destructive">
+                                    {ticket?.quantity - ticketsSales} left
+                                  </Badge>
+                                )}
                               </div>
-                              <p className="flex items-center gap-1 font-semibold text-lg">
-                                {ticket?.amount}
-                              </p>
+                              {ticket?.amount === 0 ? (
+                                <p className="flex items-center gap-1 font-semibold text-lg">
+                                  Free
+                                </p>
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <div className="w-6 h-6 text-muted-foreground">
+                                    <SatoshiIcon />
+                                  </div>
+                                  <p className="flex items-center gap-1 font-semibold text-lg">
+                                    {ticket?.amount}
+                                  </p>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          <Button
-                            variant={
-                              screen !== 'information' || ticketQuantity === 1
-                                ? 'ghost'
-                                : 'secondary'
-                            }
-                            size="icon"
-                            onClick={() =>
-                              setTicketQuantity(ticketQuantity - 1)
-                            }
-                            disabled={
-                              screen !== 'information' || ticketQuantity === 1
-                            }
-                          >
-                            <MinusIcon />
-                          </Button>
-                          <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
-                            {screen !== 'information' && (
-                              <span className="font-normal text-xs text-text">
-                                x
-                              </span>
-                            )}
-                            {ticketQuantity}
-                          </p>
-                          <Button
-                            variant={
-                              screen !== 'information' ||
-                              (ticket?.amount === 0 && ticketQuantity === 1) ||
-                              ticketQuantity === ticketsCount?.data?.count
-                                ? 'ghost'
-                                : 'secondary'
-                            }
-                            size="icon"
-                            onClick={() =>
-                              setTicketQuantity(ticketQuantity + 1)
-                            }
-                            disabled={
-                              screen !== 'information' ||
-                              (ticket?.amount === 0 && ticketQuantity === 1) ||
-                              ticketQuantity === ticketsCount?.data?.count
-                            }
-                          >
-                            <PlusIcon />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                    <div className="flex flex-col gap-4 p-4">
-                      {/* Code */}
-                      {/* <div className="flex items-center justify-between gap-2">
+                            <div className="flex gap-2 items-center">
+                              <Button
+                                variant={
+                                  screen !== 'information' ||
+                                  ticketQuantity === 1
+                                    ? 'ghost'
+                                    : 'secondary'
+                                }
+                                size="icon"
+                                onClick={() =>
+                                  setTicketQuantity(ticketQuantity - 1)
+                                }
+                                disabled={
+                                  screen !== 'information' ||
+                                  ticketQuantity === 1
+                                }
+                              >
+                                <MinusIcon />
+                              </Button>
+                              <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                                {screen !== 'information' && (
+                                  <span className="font-normal text-xs text-text">
+                                    x
+                                  </span>
+                                )}
+                                {ticketQuantity}
+                              </p>
+                              <Button
+                                variant={
+                                  screen !== 'information' ||
+                                  (ticket?.amount === 0 && ticketQuantity === 1)
+                                    ? 'ghost'
+                                    : 'secondary'
+                                }
+                                size="icon"
+                                onClick={() =>
+                                  setTicketQuantity(ticketQuantity + 1)
+                                }
+                                disabled={
+                                  ticket?.quantity === ticketsSales ||
+                                  screen !== 'information' ||
+                                  (ticket?.amount === 0 && ticketQuantity === 1)
+                                }
+                              >
+                                <PlusIcon />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                        <div className="flex flex-col gap-4 p-4">
+                          {/* Code */}
+                          {/* <div className="flex items-center justify-between gap-2">
                         <Label htmlFor="code">Code</Label>
                         <div className="relative">
                           <Input
@@ -393,42 +396,43 @@ export function CheckOut(props: any) {
                           </div>
                         </div>
                       </div> */}
-                      {/* Comision */}
-                      {ticket?.amount !== 0 && (
-                        <div className="flex gap-4 justify-between items-center">
-                          <div className="flex flex-col">
-                            <p className="text-text">
-                              Service <span className="text-sm">({FEE}%)</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1 text-right">
-                            <div className="w-6 h-6 text-muted-foreground">
-                              <SatoshiIcon />
+                          {/* Comision */}
+                          {ticket?.amount !== 0 && (
+                            <div className="flex gap-4 justify-between items-center">
+                              <div className="flex flex-col">
+                                <p className="text-text">
+                                  Service{' '}
+                                  <span className="text-sm">({FEE}%)</span>
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 text-right">
+                                <div className="w-6 h-6 text-muted-foreground">
+                                  <SatoshiIcon />
+                                </div>
+                                <p className="font-bold text-md">
+                                  {(
+                                    ticketQuantity *
+                                    ticket?.amount *
+                                    0.042
+                                  ).toFixed(0)}
+                                </p>
+                              </div>
                             </div>
-                            <p className="font-bold text-md">
-                              {(
-                                ticketQuantity *
-                                ticket?.amount *
-                                0.042
-                              ).toFixed(0)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {/* Total */}
-                      {ticket?.amount !== 0 && (
-                        <div className="flex gap-4 justify-between items-center">
-                          <div className="flex flex-col">
-                            {/* {discountMultiple !== 1 && (
+                          )}
+                          {/* Total */}
+                          {ticket?.amount !== 0 && (
+                            <div className="flex gap-4 justify-between items-center">
+                              <div className="flex flex-col">
+                                {/* {discountMultiple !== 1 && (
                             <p className="text-sm text-primary">
                               {((1 - discountMultiple) * 100).toFixed(0)}
                               {'% OFF'}
                             </p>
                           )} */}
-                            <p className="text-text">Total</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-right">
-                            {/* {discountMultiple !== 1 && (
+                                <p className="text-text">Total</p>
+                              </div>
+                              <div className="flex items-center gap-1 text-right">
+                                {/* {discountMultiple !== 1 && (
                             <p className="flex items-center gap-1 line-through text-text">
                               {Math.round(totalSats / discountMultiple)}
                               <span className="text-sm text-muted-foreground font-normal">
@@ -436,19 +440,21 @@ export function CheckOut(props: any) {
                               </span>
                             </p>
                           )} */}
-                            <div className="w-6 h-6 text-muted-foreground">
-                              <SatoshiIcon />
+                                <div className="w-6 h-6 text-muted-foreground">
+                                  <SatoshiIcon />
+                                </div>
+                                <p className="flex items-center gap-1 font-bold text-md">
+                                  {(
+                                    ticketQuantity * ticket?.amount +
+                                    ticketQuantity * ticket?.amount * 0.042
+                                  ).toFixed(0)}
+                                </p>
+                              </div>
                             </div>
-                            <p className="flex items-center gap-1 font-bold text-md">
-                              {(
-                                ticketQuantity * ticket?.amount +
-                                ticketQuantity * ticket?.amount * 0.042
-                              ).toFixed(0)}
-                            </p>
-                          </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      </>
+                    )}
                   </>
                 )}
               </>
@@ -475,7 +481,14 @@ export function CheckOut(props: any) {
                       <Card className="p-4 bg-background">
                         <div className="flex justify-between items-center gap-4">
                           <div>
-                            <h2 className="text-md">{ticket?.title}</h2>
+                            <div className="flex items-center gap-2">
+                              <h2 className="text-md">{ticket?.title}</h2>
+                              {ticket?.quantity - ticketsSales < 4 && (
+                                <Badge variant="destructive">
+                                  {ticket?.quantity - ticketsSales} left
+                                </Badge>
+                              )}
+                            </div>
                             {ticket?.amount === 0 ? (
                               <p className="flex items-center gap-1 font-semibold text-lg">
                                 Free
@@ -584,7 +597,14 @@ export function CheckOut(props: any) {
                   <Card className="p-4 bg-background">
                     <div className="flex justify-between items-center gap-4">
                       <div>
-                        <h2 className="text-md">{ticket?.title}</h2>
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-md">{ticket?.title}</h2>
+                          {ticket?.quantity - ticketsSales < 4 && (
+                            <Badge variant="destructive">
+                              {ticket?.quantity - ticketsSales} left
+                            </Badge>
+                          )}
+                        </div>
                         {ticket?.amount === 0 ? (
                           <p className="font-semibold text-lg">Free</p>
                         ) : (
@@ -666,56 +686,63 @@ export function CheckOut(props: any) {
         {/* Section data */}
         <section className="relative flex flex-1 md:flex-auto w-full justify-center md:pr-4">
           <div className="flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]">
-            <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
-              <div className="w-full max-w-[520px]">
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <BreadcrumbPage
-                        className={cn(
-                          '',
-                          screen === 'information' ? 'text-white' : 'text-text'
-                        )}
-                      >
-                        Information
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    {ticket?.amount !== 0 && (
-                      <>
-                        <BreadcrumbItem>
-                          <BreadcrumbPage
-                            className={cn(
-                              '',
-                              screen === 'payment' ? 'text-white' : 'text-text'
-                            )}
-                          >
-                            Payment
-                          </BreadcrumbPage>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                      </>
-                    )}
-                    <BreadcrumbItem>
-                      <BreadcrumbPage
-                        className={cn(
-                          '',
-                          screen === 'summary' ? 'text-white' : 'text-text'
-                        )}
-                      >
-                        Summary
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
+            {ticketsSales !== ticket?.quantity && (
+              <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
+                <div className="w-full max-w-[520px]">
+                  <Breadcrumb>
+                    <BreadcrumbList>
+                      <BreadcrumbItem>
+                        <BreadcrumbPage
+                          className={cn(
+                            '',
+                            screen === 'information'
+                              ? 'text-white'
+                              : 'text-text'
+                          )}
+                        >
+                          Information
+                        </BreadcrumbPage>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator />
+                      {ticket?.amount !== 0 && (
+                        <>
+                          <BreadcrumbItem>
+                            <BreadcrumbPage
+                              className={cn(
+                                '',
+                                screen === 'payment'
+                                  ? 'text-white'
+                                  : 'text-text'
+                              )}
+                            >
+                              Payment
+                            </BreadcrumbPage>
+                          </BreadcrumbItem>
+                          <BreadcrumbSeparator />
+                        </>
+                      )}
+                      <BreadcrumbItem>
+                        <BreadcrumbPage
+                          className={cn(
+                            '',
+                            screen === 'summary' ? 'text-white' : 'text-text'
+                          )}
+                        >
+                          Summary
+                        </BreadcrumbPage>
+                      </BreadcrumbItem>
+                    </BreadcrumbList>
+                  </Breadcrumb>
+                </div>
               </div>
-            </div>
+            )}
 
             {screen === 'information' && (
               <FormCustomer
                 onSubmit={handleCreateUser}
                 loading={isLoading}
                 eventId={event?.id}
+                soldOut={ticketsSales === ticket?.quantity}
                 // discountMultiple={discountMultiple}
                 // isCodeLoading={isCodeLoading}
                 // setCode={setCode}

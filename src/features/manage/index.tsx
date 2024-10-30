@@ -41,7 +41,7 @@ export function Manage(props: {
   const { event, ticket, orders, sales } = props;
 
   const paid = (
-    (Number(orders?.filter((order: any) => order.paid).length) * 100) /
+    (Number(orders?.filter((order: any) => order.paid)?.length) * 100) /
     Number(orders?.length)
   ).toFixed(0);
 
@@ -156,7 +156,7 @@ export function Manage(props: {
             <Card className="flex-1">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Paid</p>
-                <p className="text-xl font-bold">{paid}%</p>
+                <p className="text-xl font-bold">{!!!paid ? paid : 0}%</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
@@ -168,7 +168,9 @@ export function Manage(props: {
             <Card className="flex-1">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Attendance</p>
-                <p className="text-xl font-bold">{attandance}%</p>
+                <p className="text-xl font-bold">
+                  {!!!attandance ? attandance : 0}%
+                </p>
               </CardContent>
             </Card>
           </div>

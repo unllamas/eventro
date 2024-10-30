@@ -20,21 +20,11 @@ export async function POST(req: NextRequest) {
   //   );
   // }
 
-  if (!pubkey) {
+  if (!pubkey && (!email || !name)) {
     return NextResponse.json(
       {
         status: false,
-        error: 'Pubkey is required',
-      },
-      { status: 400 }
-    );
-  }
-
-  if (!email || !name) {
-    return NextResponse.json(
-      {
-        status: false,
-        error: 'Email or name is required',
+        error: 'Data is required',
       },
       { status: 400 }
     );
@@ -43,9 +33,9 @@ export async function POST(req: NextRequest) {
   try {
     const user = await prisma.user.create({
       data: {
-        name: name as string,
-        email: email as string,
-        pubkey: pubkey as string,
+        name: name ?? null,
+        email: email ?? null,
+        pubkey: pubkey ?? null,
       },
     });
 
