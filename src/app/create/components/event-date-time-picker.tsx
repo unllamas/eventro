@@ -12,8 +12,8 @@ import { Calendar } from '@/components/ui/calendar';
 interface EventDateTimePickerProps {
   startDate: Date;
   startTime: string;
-  // endDate: Date;
-  // endTime: string;
+  endDate: Date;
+  endTime: string;
   onDateChange: (date: Date | undefined, type: 'start' | 'end') => void;
   onTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -21,6 +21,8 @@ interface EventDateTimePickerProps {
 export function EventDateTimePicker({
   startDate,
   startTime,
+  endDate,
+  endTime,
   onDateChange,
   onTimeChange,
 }: EventDateTimePickerProps) {
@@ -52,6 +54,34 @@ export function EventDateTimePicker({
               value={startTime}
               onChange={onTimeChange}
               placeholder="Start Time"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 w-full">
+          <Label>End Date</Label>
+          <div className="flex gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button className="h-12" variant="outline">
+                  {format(endDate, 'PPP')}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={endDate}
+                  onSelect={(date) => onDateChange(date, 'end')}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <Input
+              className="max-w-[110px]"
+              type="time"
+              name="endTime"
+              value={endTime}
+              onChange={onTimeChange}
+              placeholder="End Time"
             />
           </div>
         </div>

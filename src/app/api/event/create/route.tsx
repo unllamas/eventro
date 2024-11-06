@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
         title: event?.title as string,
         description: event?.description as string,
         start: String(event?.start),
+        end: String(event?.end),
         pubkey: pubkey as string,
         nostrId: nostrId as string,
         status: 'active',

@@ -47,12 +47,15 @@ import { EventDetails, Ticket, FileNostr } from '@/types/event';
 import { SatoshiIcon } from '@/components/icons/Satoshi';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
+import { createUnixTimestamp } from '@/lib/utils';
 
 export default function Page() {
   const [eventDetails, setEventDetails] = useState<EventDetails>({
     title: '',
     startDate: new Date(),
     startTime: '',
+    endDate: new Date(),
+    endTime: '',
     description: '',
     tickets: [],
   });
@@ -95,14 +98,6 @@ export default function Page() {
       //   console.error('Image upload failed:', res.message);
       // }
     }
-  };
-
-  const createUnixTimestamp = (date: Date, timeString: string): number => {
-    if (!timeString) return Math.floor(date.getTime() / 1000);
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const newDate = new Date(date);
-    newDate.setHours(hours, minutes);
-    return Math.floor(newDate.getTime() / 1000);
   };
 
   const handleNewTicketChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +146,7 @@ export default function Page() {
           eventDetails.startDate,
           eventDetails.startTime
         ),
+        end: createUnixTimestamp(eventDetails.endDate, eventDetails.endTime),
       },
       tickets: eventDetails.tickets,
     };
@@ -215,8 +211,8 @@ export default function Page() {
               <EventDateTimePicker
                 startDate={eventDetails.startDate}
                 startTime={eventDetails.startTime}
-                // endDate={eventDetails.endDate}
-                // endTime={eventDetails.endTime}
+                endDate={eventDetails.endDate}
+                endTime={eventDetails.endTime}
                 onDateChange={handleDateChange}
                 onTimeChange={handleEventChange}
               />
@@ -300,7 +296,7 @@ export default function Page() {
                                 name="amount"
                                 value={newTicket?.amount as number}
                                 onChange={handleNewTicketChange}
-                                placeholder="Free"
+                                placeholder="Value (*)"
                               />
                             </div>
                           </div>

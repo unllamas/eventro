@@ -2,6 +2,8 @@ export interface EventDetails {
   title: string;
   startDate: Date;
   startTime: string;
+  endDate: Date;
+  endTime: string;
   description: string;
   tickets: Ticket[];
 }
