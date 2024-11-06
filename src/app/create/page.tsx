@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   ChevronLeft,
@@ -48,6 +49,7 @@ import { SatoshiIcon } from '@/components/icons/Satoshi';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { createUnixTimestamp } from '@/lib/utils';
+import { NavbarV2 } from '@/components/navbar';
 
 export default function Page() {
   const [eventDetails, setEventDetails] = useState<EventDetails>({
@@ -184,17 +186,9 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navbar */}
+      <NavbarV2 label="Create event" backTo="/dash" />
       <main className="flex flex-col gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex items-center gap-2">
-            <Button variant="link" size="icon" asChild>
-              <Link href={`/dash`}>
-                <ChevronLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-            <h1 className="text-xl font-bold text-white">Create event</h1>
-          </div>
-        </div>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col md:flex-row gap-8 w-full"

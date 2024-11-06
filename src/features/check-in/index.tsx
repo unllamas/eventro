@@ -2,6 +2,7 @@
 
 import React, { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { QrCode, ChevronLeft, Minus, Plus, Search, X } from 'lucide-react';
 
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ import {
 
 import { Input } from '@/components/ui/input';
 import { QrScanner } from './components/scanner';
+import { NavbarV2 } from '@/components/navbar';
 
 export function CheckIn(props: { event: any; sales: any }) {
   const { event, sales } = props;
@@ -126,20 +128,15 @@ export function CheckIn(props: { event: any; sales: any }) {
   return (
     <>
       <div className="w-full min-h-screen">
+        {/* Navbar */}
+        <NavbarV2 label="Check-in" backTo={`/manage/${event?.id}`} />
         <div className="flex flex-col gap-4 w-full max-w-[720px] mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Button variant="link" size="icon" asChild>
-                <Link href={`/manage/${event?.id}`}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Link>
-              </Button>
-              <div className="flex flex-col">
-                <h1 className="text-xl font-bold">{event?.title}</h1>
-                {/* <p className="text-white/70 text-sm">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold">{event?.title}</h1>
+              {/* <p className="text-white/70 text-sm">
                   Comenzó hace hace 3 días
                 </p> */}
-              </div>
             </div>
 
             <div className="w-full md:w-auto">
@@ -149,7 +146,7 @@ export function CheckIn(props: { event: any; sales: any }) {
                 onClick={openModal}
               >
                 <QrCode className="w-4 h-4 mr-1" />
-                Scan QR Code
+                Scan QR
                 {/* {loading ? 'Escaneando' : 'Scan QR Code'} */}
               </Button>
 

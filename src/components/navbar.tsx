@@ -1,5 +1,8 @@
 import Link from 'next/link';
-// import Image from 'next/image';
+import Image from 'next/image';
+
+import { Button } from './ui/button';
+import { ChevronLeft } from 'lucide-react';
 
 export function Navbar() {
   return (
@@ -51,5 +54,47 @@ function LaCryptaIso(props: any) {
         fill="currentColor"
       />
     </svg>
+  );
+}
+
+export function NavbarV2({ label, backTo }: any) {
+  return (
+    <div className="flex flex-col bg-black border-b-[1px] border-border">
+      <div className="flex flex-col gap-4 w-full max-w-[720px] mx-auto px-4 py-8">
+        <nav className="flex items-center justify-between gap-4">
+          <div className="max-w-[30px]">
+            <Link href="/dash">
+              <Image
+                src={'/iso.png'}
+                alt="Eventro isologo"
+                width={42}
+                height={42}
+              />
+            </Link>
+          </div>
+          <div className="flex flex-col items-start">
+            <ul>
+              <li>
+                <Button size="sm" variant="outline" asChild>
+                  <Link href="">Account</Link>
+                </Button>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <div className="flex justify-between items-center w-full">
+          <div className="flex flex-col items-start">
+            {backTo && (
+              <Button className="px-0" variant="link" size="sm" asChild>
+                <Link href={backTo}>
+                  <ChevronLeft className="h-4 w-4" /> Back
+                </Link>
+              </Button>
+            )}
+            <h1 className="text-xl font-bold text-white">{label}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

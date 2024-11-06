@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowUpRight,
   ChevronLeft,
@@ -31,6 +32,7 @@ import { EVENT_MOCK, ORDERS_MOCK, TICKETS_MOCK } from '@/mock';
 import { Separator } from '@/components/ui/separator';
 
 import { prisma } from '@/services/prismaClient';
+import { NavbarV2 } from '@/components/navbar';
 
 export function Manage(props: {
   event: any;
@@ -51,14 +53,11 @@ export function Manage(props: {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navbar */}
+      <NavbarV2 label="Manage event" backTo="/dash" />
       <div className="flex flex-col items-start gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           <div className="flex items-center gap-2 w-full">
-            <Button variant="link" size="icon" asChild>
-              <Link href={`/dash`}>
-                <ChevronLeft className="h-4 w-4" />
-              </Link>
-            </Button>
             <div className="flex flex-col">
               <p className="text-sm">
                 {new Date(Number(event?.start) * 1000).toLocaleDateString(

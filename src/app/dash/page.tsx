@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, CircleHelpIcon, CirclePlus, ScanLine } from 'lucide-react';
 
 // import fetcher from '@/lib/fetcher';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 // import { SalesTab } from './components/sales-tab';
 
 import { prisma } from '@/services/prismaClient';
+import { NavbarV2 } from '@/components/navbar';
 
 export default async function Page() {
   const pubkey = 'user_pubkey_here'; // Replace with actual user pubkey
@@ -28,20 +30,8 @@ export default async function Page() {
 
   return (
     <div className="min-h-screen bg-background">
+      <NavbarV2 label="My events" />
       <div className="flex flex-col gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex flex-col items-start">
-            <h1 className="text-xl font-bold text-white">My events</h1>
-          </div>
-          <div className="flex gap-2">
-            {/* <Button asChild>
-              <Link href={`/create`}>
-                <CirclePlus className="w-4 h-w-4 mr-1" />
-                Create event
-              </Link>
-            </Button> */}
-          </div>
-        </div>
         <div className="flex-1 flex justify-center items-center h-full p-8 bg-card border-2 border-dashed border-white/20 rounded-2xl text-center">
           <div className="flex flex-col items-center gap-2 w-full max-w-sm">
             <CircleHelpIcon className="w-8 h-w-8 text-primary" />
