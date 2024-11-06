@@ -40,10 +40,9 @@ export function Manage(props: {
 }) {
   const { event, ticket, orders, sales } = props;
 
-  const paid = (
-    (Number(orders?.filter((order: any) => order.paid)?.length) * 100) /
-    Number(orders?.length)
-  ).toFixed(0);
+  const paid =
+    (Number(orders?.filter((order: any) => order?.paid)?.length) * 100) /
+    Number(orders?.length);
 
   const attandance = (
     (Number(sales?.filter((sale: any) => sale.checkIn).length) * 100) /
@@ -53,8 +52,8 @@ export function Manage(props: {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex flex-col items-start gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+          <div className="flex items-center gap-2 w-full">
             <Button variant="link" size="icon" asChild>
               <Link href={`/dash`}>
                 <ChevronLeft className="h-4 w-4" />
@@ -81,14 +80,14 @@ export function Manage(props: {
               <h1 className="text-xl font-bold text-white">{event?.title}</h1>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline">
+          <div className="flex-1 flex gap-2 w-full">
+            <Button className="w-full md:w-auto" asChild variant="outline">
               <Link href={`/check-out/${event?.nostrId}`}>
                 Event
                 <ArrowUpRight className="w-5 h-w-5 ml-1" />
               </Link>
             </Button>
-            <Button asChild>
+            <Button className="w-full md:w-auto" asChild>
               <Link href={`/check-in/${event?.id}`}>
                 <ScanLine className="w-5 h-w-5 mr-1" />
                 Register
@@ -156,7 +155,7 @@ export function Manage(props: {
             <Card className="flex-1">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Paid</p>
-                <p className="text-xl font-bold">{!!!paid ? paid : 0}%</p>
+                <p className="text-xl font-bold">{!!paid ? paid : 0}%</p>
               </CardContent>
             </Card>
             <Card className="flex-1">

@@ -1,31 +1,26 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import {
-  ArrowRight,
-  ArrowUpRight,
-  CircleHelpIcon,
-  CirclePlus,
-  ScanLine,
-} from 'lucide-react';
+import { ArrowRight, CircleHelpIcon, CirclePlus, ScanLine } from 'lucide-react';
 
 // import fetcher from '@/lib/fetcher';
 
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // import { TicketsTab } from './components/tickets-tab';
 // import { SettingsTab } from './components/settings-tab';
 // import { SalesTab } from './components/sales-tab';
-import { EVENT_MOCK, EVENTS_MOCK } from '@/mock';
 
 import { prisma } from '@/services/prismaClient';
 
 export default async function Page() {
   const pubkey = 'user_pubkey_here'; // Replace with actual user pubkey
+  const currentTime = Math.floor(Date.now() / 1000);
 
   const events = await prisma.event.findMany({
     where: {
       pubkey: pubkey as string,
+      end: {
+        gte: String(currentTime),
+      },
     },
   });
 

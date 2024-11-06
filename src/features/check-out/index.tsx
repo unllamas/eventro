@@ -168,7 +168,7 @@ export function CheckOut(props: any) {
   }) => {
     if ((!data?.email || !data?.name) && !data?.pubkey) return null;
 
-    if (ticket?.quantity - ticketsSales === 0) {
+    if (ticket?.quantity > 0 && ticket?.quantity - ticketsSales === 0) {
       toast({
         variant: 'destructive',
         title: 'Oops... ',
@@ -284,18 +284,20 @@ export function CheckOut(props: any) {
                         </p>
                       )}
                     </div>
-                    {ticketsSales !== ticket?.quantity && (
+                    {(ticket?.quantity === 0 ||
+                      ticketsSales !== ticket?.quantity) && (
                       <>
                         <Card className="p-4 bg-background">
                           <div className="flex justify-between items-center gap-4">
                             <div>
                               <div className="flex items-center gap-2">
                                 <h2 className="text-md">{ticket?.title}</h2>
-                                {ticket?.quantity - ticketsSales < 4 && (
-                                  <Badge variant="destructive">
-                                    {ticket?.quantity - ticketsSales} left
-                                  </Badge>
-                                )}
+                                {ticket?.quantity > 0 &&
+                                  ticket?.quantity - ticketsSales < 4 && (
+                                    <Badge variant="destructive">
+                                      {ticket?.quantity - ticketsSales} left
+                                    </Badge>
+                                  )}
                               </div>
                               {ticket?.amount === 0 ? (
                                 <p className="flex items-center gap-1 font-semibold text-lg">
@@ -342,6 +344,7 @@ export function CheckOut(props: any) {
                               <Button
                                 variant={
                                   screen !== 'information' ||
+                                  ticket?.quantity == 0 ||
                                   (ticket?.amount === 0 && ticketQuantity === 1)
                                     ? 'ghost'
                                     : 'secondary'
@@ -483,11 +486,12 @@ export function CheckOut(props: any) {
                           <div>
                             <div className="flex items-center gap-2">
                               <h2 className="text-md">{ticket?.title}</h2>
-                              {ticket?.quantity - ticketsSales < 4 && (
-                                <Badge variant="destructive">
-                                  {ticket?.quantity - ticketsSales} left
-                                </Badge>
-                              )}
+                              {ticket?.quantity > 0 &&
+                                ticket?.quantity - ticketsSales < 4 && (
+                                  <Badge variant="destructive">
+                                    {ticket?.quantity - ticketsSales} left
+                                  </Badge>
+                                )}
                             </div>
                             {ticket?.amount === 0 ? (
                               <p className="flex items-center gap-1 font-semibold text-lg">
@@ -686,7 +690,7 @@ export function CheckOut(props: any) {
         {/* Section data */}
         <section className="relative flex flex-1 md:flex-auto w-full justify-center md:pr-4">
           <div className="flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]">
-            {ticketsSales !== ticket?.quantity && (
+            {(ticket?.quantity === 0 || ticketsSales !== ticket?.quantity) && (
               <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
                 <div className="w-full max-w-[520px]">
                   <Breadcrumb>
@@ -742,7 +746,9 @@ export function CheckOut(props: any) {
                 onSubmit={handleCreateUser}
                 loading={isLoading}
                 eventId={event?.id}
-                soldOut={ticketsSales === ticket?.quantity}
+                soldOut={
+                  ticket?.quantity > 0 && ticketsSales === ticket?.quantity
+                }
                 // discountMultiple={discountMultiple}
                 // isCodeLoading={isCodeLoading}
                 // setCode={setCode}
