@@ -33,6 +33,8 @@ import { Separator } from '@/components/ui/separator';
 
 import { prisma } from '@/services/prismaClient';
 import { NavbarV2 } from '@/components/navbar';
+import { useActiveUser, useProfile } from 'nostr-hooks';
+import { useMemo } from 'react';
 
 export function Manage(props: {
   event: any;
@@ -41,6 +43,12 @@ export function Manage(props: {
   sales: any;
 }) {
   const { event, ticket, orders, sales } = props;
+
+  const { activeUser } = useActiveUser();
+
+  // TO-DO: Optimize this
+  const filters = useMemo(() => activeUser?.pubkey, [activeUser?.pubkey]);
+  const { profile } = useProfile({ pubkey: filters });
 
   const paid =
     (Number(orders?.filter((order: any) => order?.paid)?.length) * 100) /
@@ -52,7 +60,7 @@ export function Manage(props: {
   ).toFixed(0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="w-full min-h-screen bg-background">
       {/* Navbar */}
       <NavbarV2 label="Manage event" backTo="/dash" />
       <div className="flex flex-col items-start gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
@@ -239,13 +247,22 @@ export function Manage(props: {
               <CardContent className="flex items-center justify-between gap-8">
                 <div className="flex items-center justify-between gap-4 w-full">
                   <div className="flex items-center gap-4">
-                    <div className="relative w-10 h-10 rounded-full bg-background border-[1px] border-border"></div>
+                    {profile && (
+                      <div className="relative w-10 h-10 rounded-full bg-background border-[1px] border-border">
+                        <Image
+                          className="rounded-full"
+                          src={profile?.image as string}
+                          alt="Profile image"
+                          fill
+                        />
+                      </div>
+                    )}
                     <div className="flex flex-col">
-                      {/* <p className="text-md">
-                        <strong>Jona</strong>
-                      </p> */}
+                      <p className="text-md">
+                        <strong>{profile?.name}</strong>
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        {event?.pubkey}
+                        {profile?.nip05}
                       </p>
                     </div>
                   </div>
