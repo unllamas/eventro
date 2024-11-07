@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { nip19 } from 'nostr-tools';
+import { useActiveUser, useLogin } from 'nostr-hooks';
 
 import { useToast } from '@/hooks/use-toast';
 
@@ -15,7 +17,10 @@ import Link from 'next/link';
 export default function Page() {
   // const hasWaitlist = localStorage.getItem('whitelist') === 'true';
 
+  const router = useRouter();
   const { toast } = useToast();
+  const { loginWithExtension } = useLogin();
+  const { activeUser } = useActiveUser();
 
   const [loading, setLoading] = useState(false);
   const [submit, setSubmit] = useState(false);
@@ -73,26 +78,29 @@ export default function Page() {
     }
   };
 
+  const handleLogin = () => {
+    loginWithExtension();
+    router.push('/dash');
+  };
+
   return (
     <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen bg-gradient-to-tl from-[#292929] to-[#0A0A0A]">
-      <div className="flex-1 flex flex-col justify-center items-center gap-4">
-        <main className="flex flex-col gap-8 w-full max-w-[960px] h-full mx-auto px-4 py-8">
-          <div className="flex flex-col items-center gap-4 text-center max-w-2xl mx-auto">
-            <Image
-              src="/logo.png"
-              alt="Eventro logo"
-              width={280}
-              height={60}
-              quality={100}
-              priority
-            />
-            {/* <Logo /> */}
-            {/* <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-              ...
-            </h1> */}
-            <h1 className="text-xl md:text-2xl text-white/70">
+      <nav className="w-full h-[60px] px-4 bg-black border-b-[1px] border-border">
+        <div className="flex flex-col justify-center gap-8 w-full max-w-2xl h-full mx-auto">
+          <div className="flex justify-between items-center gap-4 text-center">
+            <div className="max-w-[220px]">
+              <Image
+                src="/logo.png"
+                alt="Eventro logo"
+                width={280}
+                height={60}
+                quality={100}
+                priority
+              />
+            </div>
+            {/* <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
-            </h1>
+            </h1> */}
             {/* {!submit ? (
               <JoinWaitlist
                 label="Sign me up for the beta"
@@ -100,14 +108,21 @@ export default function Page() {
                 loading={loading}
               />
             ) : ( */}
-            <Button asChild>
-              <Link href="/dash">Go to dashboard</Link>
-            </Button>
+            {/* {activeUser && (
+              <Button size="sm" variant="secondary" asChild>
+                <Link href="/dash">Go to dashboard</Link>
+              </Button>
+            )} */}
             {/* )} */}
           </div>
-        </main>
-
-        <div className="grid gap-2 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        </div>
+      </nav>
+      <div className="flex-1 flex flex-col justify-center items-center gap-4 max-w-2xl mx-auto px-4">
+        <h1 className="text-xl md:text-4xl text-center">
+          Create unforgettable events, we&apos;ll take care of the rest.
+        </h1>
+        {!activeUser && <Button onClick={handleLogin}>Login</Button>}
+        {/* <div className="grid gap-2 md:gap-8 grid-cols-1 md:grid-cols-2">
           {FEATURES_MOCK?.map((feature) => (
             <div
               className="flex flex-col items-center px-2 max-w-[240px] text-center"
@@ -122,7 +137,7 @@ export default function Page() {
               </p>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
       <div className="flex items-end justify-center px-4">
         <div className="relative -mr-24 flex flex-col justify-center items-center">
