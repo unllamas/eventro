@@ -344,8 +344,9 @@ export function CheckOut(props: any) {
                               <Button
                                 variant={
                                   screen !== 'information' ||
-                                  ticket?.quantity == 0 ||
-                                  (ticket?.amount === 0 && ticketQuantity === 1)
+                                  (ticket?.quantity !== 0 &&
+                                    ticket?.amount === 0 &&
+                                    ticketQuantity === 1)
                                     ? 'ghost'
                                     : 'secondary'
                                 }

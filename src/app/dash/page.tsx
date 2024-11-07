@@ -32,7 +32,7 @@ export default async function Page() {
     <div className="min-h-screen bg-background">
       <NavbarV2 label="My events" />
       <div className="flex flex-col gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
-        <div className="flex-1 flex justify-center items-center h-full p-8 bg-card border-2 border-dashed border-white/20 rounded-2xl text-center">
+        <div className="flex-1 flex justify-center items-center h-full p-8 bg-black border-2 border-dashed border-white/20 rounded-2xl text-center">
           <div className="flex flex-col items-center gap-2 w-full max-w-sm">
             <CircleHelpIcon className="w-8 h-w-8 text-primary" />
             <h3 className="text-lg font-bold">Come on, we&apos;ll help you!</h3>

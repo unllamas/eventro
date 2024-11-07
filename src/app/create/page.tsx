@@ -162,8 +162,6 @@ export default function Page() {
         body: JSON.stringify(eventData),
       });
 
-      console.log('response', response);
-
       if (!response?.ok) {
         setLoading(false);
 
@@ -172,8 +170,7 @@ export default function Page() {
       }
 
       const { id } = await response.json();
-      console.log('Event created with ID:', id);
-      router.push(`/dash`);
+      router.push(`/manage/${id}`);
 
       return null;
     } catch (error) {
@@ -217,7 +214,7 @@ export default function Page() {
               />
 
               {eventDetails?.tickets?.length === 0 ? (
-                <div className="flex justify-center items-center p-8 bg-card border-2 border-dashed border-white/20 rounded-2xl text-center">
+                <div className="flex justify-center items-center p-8 bg-black border-2 border-dashed border-white/20 rounded-2xl text-center">
                   <div className="flex flex-col items-center gap-2 w-full max-w-sm">
                     <TicketIcon className="w-8 h-w-8 text-primary" />
                     <h3 className="text-lg font-bold">
@@ -291,6 +288,7 @@ export default function Page() {
                                 value={newTicket?.amount as number}
                                 onChange={handleNewTicketChange}
                                 placeholder="Value (*)"
+                                required
                               />
                             </div>
                           </div>
@@ -328,9 +326,15 @@ export default function Page() {
                             className="w-full"
                             onClick={addTicket}
                             variant={
-                              newTicket.title === '' ? 'ghost' : 'default'
+                              newTicket.title === '' ||
+                              Number(newTicket?.amount) === 0
+                                ? 'ghost'
+                                : 'default'
                             }
-                            disabled={newTicket.title === ''}
+                            disabled={
+                              newTicket.title === '' ||
+                              Number(newTicket?.amount) === 0
+                            }
                           >
                             Add Ticket
                           </Button>
