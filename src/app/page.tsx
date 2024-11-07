@@ -2,25 +2,25 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { nip19 } from 'nostr-tools';
-import { useActiveUser, useLogin } from 'nostr-hooks';
+// import { useActiveUser, useLogin } from 'nostr-hooks';
 
 import { useToast } from '@/hooks/use-toast';
 
 import { JoinWaitlist } from '@/components/join-wailist';
 
-import { FEATURES_MOCK } from '@/mock';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+// import { FEATURES_MOCK } from '@/mock';
+// import { Button } from '@/components/ui/button';
+// import Link from 'next/link';
 
 export default function Page() {
   // const hasWaitlist = localStorage.getItem('whitelist') === 'true';
 
-  const router = useRouter();
+  // const router = useRouter();
   const { toast } = useToast();
-  const { loginWithExtension } = useLogin();
-  const { activeUser } = useActiveUser();
+  // const { loginWithExtension } = useLogin();
+  // const { activeUser } = useActiveUser();
 
   const [loading, setLoading] = useState(false);
   const [submit, setSubmit] = useState(false);
@@ -78,10 +78,10 @@ export default function Page() {
     }
   };
 
-  const handleLogin = () => {
-    loginWithExtension();
-    router.push('/dash');
-  };
+  // const handleLogin = () => {
+  //   loginWithExtension();
+  //   router.push('/dash');
+  // };
 
   return (
     <div className="overflow-hidden flex flex-col gap-8 justify-between min-h-screen bg-gradient-to-tl from-[#292929] to-[#0A0A0A]">
@@ -101,27 +101,26 @@ export default function Page() {
             {/* <h1 className="text-xl md:text-2xl text-white/70">
               Create unforgettable events, we&apos;ll take care of the rest.
             </h1> */}
-            {/* {!submit ? (
-              <JoinWaitlist
-                label="Sign me up for the beta"
-                onSubmit={handleSubmit}
-                loading={loading}
-              />
-            ) : ( */}
             {/* {activeUser && (
               <Button size="sm" variant="secondary" asChild>
                 <Link href="/dash">Go to dashboard</Link>
               </Button>
             )} */}
-            {/* )} */}
           </div>
         </div>
       </nav>
       <div className="flex-1 flex flex-col justify-center items-center gap-4 max-w-2xl mx-auto px-4">
-        <h1 className="text-xl md:text-4xl text-center">
+        <h1 className="text-2xl md:text-6xl text-center font-bold">
           Create unforgettable events, we&apos;ll take care of the rest.
         </h1>
-        {!activeUser && <Button onClick={handleLogin}>Login</Button>}
+        {/* {!activeUser && <Button onClick={handleLogin}>Login</Button>} */}
+        {!submit && (
+          <JoinWaitlist
+            label="Sign me up for the beta"
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        )}
         {/* <div className="grid gap-2 md:gap-8 grid-cols-1 md:grid-cols-2">
           {FEATURES_MOCK?.map((feature) => (
             <div
