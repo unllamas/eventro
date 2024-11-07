@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ImageUploader } from './components/image-uploader';
+// import { ImageUploader } from './components/image-uploader';
 import { EventDateTimePicker } from './components/event-date-time-picker';
 import { EventDescription } from './components/event-description';
 
@@ -50,6 +50,7 @@ import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { createUnixTimestamp } from '@/lib/utils';
 import { NavbarV2 } from '@/components/navbar';
+import { useActiveUser } from 'nostr-hooks';
 
 export default function Page() {
   const [eventDetails, setEventDetails] = useState<EventDetails>({
@@ -76,6 +77,9 @@ export default function Page() {
 
   // Libs and hooks
   const router = useRouter();
+  const { activeUser } = useActiveUser();
+
+  if (!activeUser) return null;
 
   const handleEventChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -137,10 +141,8 @@ export default function Page() {
     e.preventDefault();
     setLoading(true);
 
-    const pubkey = 'user_pubkey_here'; // Replace with actual user pubkey
-
     const eventData = {
-      pubkey,
+      pubkey: activeUser?.pubkey,
       event: {
         title: eventDetails.title,
         description: eventDetails.description,
@@ -170,9 +172,9 @@ export default function Page() {
       }
 
       const { id } = await response.json();
-      router.push(`/manage/${id}`);
+      if (!id) router.push(`/dash`);
 
-      return null;
+      router.push(`/manage/${id}`);
     } catch (error) {
       setLoading(false);
 
@@ -182,7 +184,7 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="w-full min-h-screen bg-background">
       {/* Navbar */}
       <NavbarV2 label="Create event" backTo="/dash" />
       <main className="flex flex-col gap-8 w-full max-w-[720px] mx-auto px-4 py-8">
