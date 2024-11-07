@@ -109,7 +109,7 @@ export default function Page() {
           </div>
         </div>
       </nav>
-      <div className="flex-1 flex flex-col justify-center items-center gap-4 max-w-2xl mx-auto px-4">
+      <div className="flex-1 flex flex-col justify-center items-center gap-4 max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-6xl text-center font-bold">
           Create unforgettable events, we&apos;ll take care of the rest.
         </h1>

@@ -1,12 +1,22 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
+import dynamic from 'next/dynamic';
+
+const AppWrapper = dynamic(
+  () => import('@/components/app-wrapper').then((mod) => mod.AppWrapper),
+  {
+    loading: () => (
+      <div className="flex justify-center items-center w-full h-full">
+        <p className="font-bold">Loading...</p>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 import { cn } from '@/lib/utils';
 
-import './globals.css';
-import { LaWalletConfig } from '@lawallet/react';
-import { Wrapper } from '@/components/wrapper';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -16,7 +26,7 @@ export const metadata: Metadata = {
   description: "Create unforgettable events, we'll take care of the rest.",
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -26,7 +36,7 @@ export default function RootLayout({
       <body
         className={cn('min-h-screen font-sans antialiased', inter.variable)}
       >
-        <Wrapper>{children}</Wrapper>
+        <AppWrapper>{children}</AppWrapper>
         <Toaster />
         <Analytics />
       </body>

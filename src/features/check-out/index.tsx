@@ -98,8 +98,7 @@ export function CheckOut(props: any) {
 
   const { toast } = useToast();
   const { invoice, createZapInvoice, resetInvoice } = useZap({
-    receiverPubkey:
-      'cee287bb0990a8ecbd1dee7ee7f938200908a5c8aa804b3bdeaed88effb55547',
+    receiverPubkey: event?.pubkey,
     config,
   });
 

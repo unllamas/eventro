@@ -4,9 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 
 import { cn } from '@/lib/utils';
 
-import './globals.css';
-import { LaWalletConfig } from '@lawallet/react';
-import { Wrapper } from '@/components/wrapper';
+import { AppWrapper } from '@/components/app-wrapper';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -26,7 +24,7 @@ export default function RootLayout({
       <body
         className={cn('min-h-screen font-sans antialiased', inter.variable)}
       >
-        <Wrapper>{children}</Wrapper>
+        <AppWrapper>{children}</AppWrapper>
         <Toaster />
         <Analytics />
       </body>
