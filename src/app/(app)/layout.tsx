@@ -1,10 +1,22 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
+import dynamic from 'next/dynamic';
+
+const AppWrapper = dynamic(
+  () => import('@/components/app-wrapper').then((mod) => mod.AppWrapper),
+  {
+    loading: () => (
+      <div className="flex justify-center items-center w-full h-full">
+        <p className="font-bold">Loading...</p>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 import { cn } from '@/lib/utils';
 
-import { AppWrapper } from '@/components/app-wrapper';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
