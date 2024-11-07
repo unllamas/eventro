@@ -245,15 +245,14 @@ export function CheckOut(props: any) {
           <div
             className={cn('flex flex-col gap-4 w-full max-w-[520px] my-4 px-4')}
           >
-            <div>
+            {/* <div>
               <Button className="px-0" size="sm" variant="link" asChild>
                 <Link href={`/manage/${event?.id}`}>
                   <ChevronLeft className="w-4 h-4" />
-                  {/* <h2 className="font-bold">{EVENT_MOCK?.title}</h2> */}
                   <h2 className="font-bold">Back to event</h2>
                 </Link>
               </Button>
-            </div>
+            </div> */}
             {screen === 'information' ? (
               <>
                 {!maxTicketsReached && (

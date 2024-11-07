@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CircleHelpIcon, CirclePlus, ScanLine } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  CircleHelpIcon,
+  CirclePlus,
+  ScanLine,
+} from 'lucide-react';
 
 // import fetcher from '@/lib/fetcher';
 
@@ -37,11 +43,10 @@ export default async function Page() {
             <CircleHelpIcon className="w-8 h-w-8 text-primary" />
             <h3 className="text-lg font-bold">Come on, we&apos;ll help you!</h3>
             <p className="text-muted-foreground">
-              You don&apos;t have any events created yet. Would you like us to
-              create one?
+              Do you want us to create a new event?
             </p>
-            <div className="mt-2">
-              <Button size="sm" asChild>
+            <div className="w-full mt-2">
+              <Button className="w-full md:w-auto" size="sm" asChild>
                 <Link href={`/create`}>
                   <CirclePlus className="w-4 h-w-4 mr-1" />
                   Create event
@@ -137,6 +142,18 @@ function EventCard(props: {
       </div>
       <div className="flex gap-2">
         <Button
+          className="w-full md:w-auto"
+          size="sm"
+          variant="outline"
+          asChild
+        >
+          <Link href={`/manage/${id}`}>
+            Manage
+            <ArrowUpRight className="w-4 h-w-4 ml-1" />
+          </Link>
+        </Button>
+        <Button
+          className="w-full md:w-auto"
           variant={day === now ? 'default' : 'secondary'}
           size="sm"
           asChild
@@ -144,12 +161,6 @@ function EventCard(props: {
           <Link href={`/check-in/${id}`}>
             <ScanLine className="w-4 h-w-4 mr-1" />
             Register
-          </Link>
-        </Button>
-        <Button size="sm" variant="outline" asChild>
-          <Link href={`/manage/${id}`}>
-            Manage
-            <ArrowRight className="w-4 h-w-4 ml-1" />
           </Link>
         </Button>
       </div>

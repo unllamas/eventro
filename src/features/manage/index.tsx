@@ -82,7 +82,7 @@ export function Manage(props: {
           <div className="flex-1 flex gap-2 w-full">
             <Button className="w-full md:w-auto" asChild variant="secondary">
               <Link href={`/check-out/${event?.nostrId}`}>
-                Event
+                Check-out
                 <ArrowUpRight className="w-5 h-w-5 ml-1" />
               </Link>
             </Button>
@@ -145,25 +145,25 @@ export function Manage(props: {
           </div>
           {/* Stats */}
           <div className="flex flex-col md:flex-row gap-4 w-full">
-            <Card className="flex-1 bg-black">
+            <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Orders</p>
                 <p className="text-xl font-bold">{orders?.length}</p>
               </CardContent>
             </Card>
-            <Card className="flex-1 bg-black">
+            <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Paid</p>
                 <p className="text-xl font-bold">{!!paid ? paid : 0}%</p>
               </CardContent>
             </Card>
-            <Card className="flex-1 bg-black">
+            <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Sold</p>
                 <p className="text-xl font-bold">{sales?.length || 0}</p>
               </CardContent>
             </Card>
-            <Card className="flex-1 bg-black">
+            <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Attendance</p>
                 <p className="text-xl font-bold">

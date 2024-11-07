@@ -1,8 +1,19 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { ChevronLeft } from 'lucide-react';
 
 import { Button } from './ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+} from '@/components/ui/dropdown-menu';
 
 export function Navbar() {
   return (
@@ -20,7 +31,14 @@ export function Navbar() {
               priority
             />
           </div> */}
-          <LaCryptaIso className="w-auto h-[30px]" />
+
+          <Image
+            src={'/iso.png'}
+            alt="Eventro isologo"
+            width={42}
+            height={42}
+          />
+          {/* <LaCryptaIso className="w-auto h-[30px]" /> */}
         </Link>
         {/* <div className='h-full flex items-center gap-2 ml-4'>
                 <Select defaultValue='SAT'>
@@ -57,32 +75,74 @@ function LaCryptaIso(props: any) {
   );
 }
 
+export function UserNav() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div className="relative w-8 h-8 rounded-full bg-background border-[1px] border-border cursor-pointer"></div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-md font-medium leading-none">shadcn</p>
+            <p className="text-sm leading-none text-muted-foreground">
+              m@example.com
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {/* <DropdownMenuGroup>
+          <DropdownMenuItem>
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            Billing
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem>New Team</DropdownMenuItem>
+        </DropdownMenuGroup> */}
+        {/* <DropdownMenuSeparator /> */}
+        <DropdownMenuItem>
+          Log out
+          {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function NavbarV2({ label, backTo }: any) {
   return (
     <div className="flex flex-col bg-black border-b-[1px] border-border">
-      <div className="flex flex-col gap-4 w-full max-w-[720px] mx-auto px-4 py-8">
-        <nav className="flex items-center justify-between gap-4">
-          <div className="max-w-[30px]">
-            <Link href="/dash">
-              <Image
-                src={'/iso.png'}
-                alt="Eventro isologo"
-                width={42}
-                height={42}
-              />
-            </Link>
+      <div className="flex flex-col w-full max-w-[720px] mx-auto px-4">
+        <nav className="flex items-center justify-between gap-4 h-[60px]">
+          <div className="flex items-center gap-2">
+            <div className="max-w-[30px]">
+              <Link href="/dash">
+                <Image
+                  src={'/iso.png'}
+                  alt="Eventro isologo"
+                  width={42}
+                  height={42}
+                />
+              </Link>
+            </div>
+            <span className="text-sm text-muted-foreground">Eventro</span>
           </div>
           <div className="flex flex-col items-start">
-            <ul>
+            <UserNav />
+            {/* <ul>
               <li>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="">Account</Link>
                 </Button>
               </li>
-            </ul>
+            </ul> */}
           </div>
         </nav>
-        <div className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full h-[60px] mb-4">
           <div className="flex flex-col items-start">
             {backTo && (
               <Button className="px-0" variant="link" size="sm" asChild>
@@ -91,7 +151,7 @@ export function NavbarV2({ label, backTo }: any) {
                 </Link>
               </Button>
             )}
-            <h1 className="text-xl font-bold text-white">{label}</h1>
+            <h1 className="text-md font-bold text-white">{label}</h1>
           </div>
         </div>
       </div>

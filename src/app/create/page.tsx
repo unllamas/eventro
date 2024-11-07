@@ -196,7 +196,7 @@ export default function Page() {
                 name="title"
                 value={eventDetails.title}
                 onChange={handleEventChange}
-                placeholder="Event Title"
+                placeholder="Event Title (*)"
               />
 
               <EventDateTimePicker
