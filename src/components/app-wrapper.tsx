@@ -42,7 +42,7 @@ const Loggin = (props: {
   // Flow
   const [inputValue, setInputValue] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [showInputSecret, setShowInputSecret] = useState<boolean>(false);
+  const [showInputSecret, setShowInputSecret] = useState<boolean>(true);
 
   // Libs and hooks
   const router = useRouter();
@@ -81,15 +81,15 @@ const Loggin = (props: {
     });
   };
 
-  const handleLoginWithExtension = () => {
-    loginWithExtension({
-      onSuccess: (signer: any) => {
-        signer.user().then((user: any) => {
-          setSigner(signer);
-        });
-      },
-    });
-  };
+  // const handleLoginWithExtension = () => {
+  //   loginWithExtension({
+  //     onSuccess: (signer: any) => {
+  //       signer.user().then((user: any) => {
+  //         setSigner(signer);
+  //       });
+  //     },
+  //   });
+  // };
 
   const handleShowInputSecret = () => {
     setShowInputSecret(!showInputSecret);
@@ -129,15 +129,15 @@ const Loggin = (props: {
         </DialogHeader>
 
         <div className="flex flex-col gap-2 w-full">
-          <Button className="w-full" onClick={handleLoginWithExtension}>
+          {/* <Button className="w-full" onClick={handleLoginWithExtension}>
             Login with extension
-          </Button>
+          </Button> */}
 
-          <div className="flex gap-4 items-center my-2">
+          {/* <div className="flex gap-4 items-center my-2">
             <Separator className="flex-1" />
             <p className="text-sm text-muted-foreground">OR</p>
             <Separator className="flex-1" />
-          </div>
+          </div> */}
 
           {!showInputSecret ? (
             <>
@@ -213,13 +213,13 @@ const Loggin = (props: {
                 >
                   Login
                 </Button>
-                <Button
+                {/* <Button
                   className="w-full"
                   onClick={handleShowInputSecret}
                   variant="ghost"
                 >
                   Cancel
-                </Button>
+                </Button> */}
               </div>
             </>
           )}
