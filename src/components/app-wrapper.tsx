@@ -170,32 +170,36 @@ const Loggin = (props: {
                     value={inputValue as string}
                     onChange={(e) => setInputValue(e.target.value)}
                   />
-                  <div className="absolute top-0 right-[10px] flex items-center h-full">
+                  <div className="absolute top-0 right-[10px] flex items-center gap-1 h-full">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="outline"
+                      size="icon"
                       onClick={handleToggleVisibility}
                       title={isPasswordVisible ? 'Hide' : 'Show'}
                     >
-                      {isPasswordVisible ? <EyeOffIcon /> : <EyeIcon />}
+                      {isPasswordVisible ? (
+                        <EyeOffIcon className="w-4 h-4" />
+                      ) : (
+                        <EyeIcon className="w-4 h-4" />
+                      )}
                     </Button>
                     {inputValue ? (
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant="outline"
+                        size="icon"
                         onClick={() => setInputValue('')}
                         title="Delete value"
                       >
-                        <Trash2Icon />
+                        <Trash2Icon className="w-4 h-4" />
                       </Button>
                     ) : (
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant="outline"
+                        size="icon"
                         onClick={handlePasteInput}
                         title="Paste from clipboard"
                       >
-                        <ClipboardCopyIcon />
+                        <ClipboardCopyIcon className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
