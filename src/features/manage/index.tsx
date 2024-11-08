@@ -35,6 +35,45 @@ import { prisma } from '@/services/prismaClient';
 import { NavbarV2 } from '@/components/navbar';
 import { useActiveUser, useProfile } from 'nostr-hooks';
 import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+
+const UserOrganizer = ({ pubkey }: { pubkey: string }) => {
+  // TO-DO: Optimize this
+  const filters = useMemo(() => pubkey, [pubkey]);
+  const { profile } = useProfile({ pubkey: filters });
+
+  return (
+    <Card className="rounded-none border-none">
+      <CardContent className="flex items-center justify-between gap-8">
+        <div className="flex items-center justify-between gap-4 w-full">
+          <div className="flex items-center gap-4">
+            {profile && (
+              <div className="relative w-10 h-10 rounded-full bg-background border-[1px] border-border">
+                <Image
+                  className="rounded-full"
+                  src={profile?.image as string}
+                  alt="Profile image"
+                  fill
+                />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <p className="text-md">
+                <strong>{profile?.name}</strong>
+              </p>
+              <p className="text-sm text-muted-foreground">{profile?.nip05}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div>
+              <Badge variant="outline">Owner</Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export function Manage(props: {
   event: any;
@@ -43,12 +82,6 @@ export function Manage(props: {
   sales: any;
 }) {
   const { event, ticket, orders, sales } = props;
-
-  const { activeUser } = useActiveUser();
-
-  // TO-DO: Optimize this
-  const filters = useMemo(() => activeUser?.pubkey, [activeUser?.pubkey]);
-  const { profile } = useProfile({ pubkey: filters });
 
   const paid =
     (Number(orders?.filter((order: any) => order?.paid)?.length) * 100) /
@@ -243,37 +276,7 @@ export function Manage(props: {
             </Dialog> */}
           </div>
           <div className="overflow-hidden flex flex-col rounded-xl border">
-            <Card className="rounded-none border-none">
-              <CardContent className="flex items-center justify-between gap-8">
-                <div className="flex items-center justify-between gap-4 w-full">
-                  <div className="flex items-center gap-4">
-                    {profile && (
-                      <div className="relative w-10 h-10 rounded-full bg-background border-[1px] border-border">
-                        <Image
-                          className="rounded-full"
-                          src={profile?.image as string}
-                          alt="Profile image"
-                          fill
-                        />
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <p className="text-md">
-                        <strong>{profile?.name}</strong>
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {profile?.nip05}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <Badge variant="outline">Owner</Badge>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <UserOrganizer pubkey={event?.pubkey} />
             {/* <Card className="rounded-none border-none">
               <CardContent className="flex items-center justify-between gap-8">
                 <div className="flex items-center justify-between gap-4 w-full">
