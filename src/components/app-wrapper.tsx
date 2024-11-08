@@ -128,7 +128,7 @@ const Loggin = (props: {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-2 w-full">
           <Button className="w-full" onClick={handleLoginWithExtension}>
             Login with extension
           </Button>
@@ -149,9 +149,9 @@ const Loggin = (props: {
                 Create account
               </Button> */}
               <div className="text-sm text-center">
-                <p className="text-muted-foreground">
+                {/* <p className="text-muted-foreground">
                   Do you already have one?
-                </p>
+                </p> */}
                 <Button variant="link" onClick={handleShowInputSecret}>
                   Login with private key
                 </Button>
