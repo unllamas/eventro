@@ -12,11 +12,15 @@ export default async function Page(props: { params: { id: string } }) {
       },
     });
 
+    if (!event) return { event: null, ticket: null, sales: null };
+
     const ticket = await prisma.ticket.findFirst({
       where: {
         eventId: event?.id as string,
       },
     });
+
+    if (!ticket) return { event, ticket: null, sales: null };
 
     const sales = await prisma.ticketSale.count({
       where: {
