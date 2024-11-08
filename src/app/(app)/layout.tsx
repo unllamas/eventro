@@ -7,7 +7,7 @@ const AppWrapper = dynamic(
   () => import('@/components/app-wrapper').then((mod) => mod.AppWrapper),
   {
     loading: () => (
-      <div className="flex justify-center items-center w-full h-full">
+      <div className="flex justify-center items-center w-screen h-screen">
         <p className="font-bold">Loading...</p>
       </div>
     ),

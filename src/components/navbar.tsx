@@ -34,9 +34,15 @@ export function Navbar() {
   );
 }
 
-export function UserNav({ name, nip05, imageUrl }: any) {
+export function UserNav({ pubkey }: any) {
   const router = useRouter();
   const { logout } = useLogin();
+
+  // TO-DO: Optimize this
+  const filters = useMemo(() => pubkey, [pubkey]);
+  const { profile } = useProfile({ pubkey: filters });
+
+  if (!profile) return null;
 
   const handleLogout = () => {
     logout();
@@ -47,10 +53,10 @@ export function UserNav({ name, nip05, imageUrl }: any) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="relative w-8 h-8 rounded-full bg-background border-[1px] border-border cursor-pointer">
-          {imageUrl && (
+          {profile?.image && (
             <Image
               className="rounded-full"
-              src={imageUrl}
+              src={profile?.image as string}
               alt="Profile image"
               fill
             />
@@ -60,10 +66,14 @@ export function UserNav({ name, nip05, imageUrl }: any) {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            {name && <p className="text-md font-medium leading-none">{name}</p>}
-            {nip05 && (
+            {profile?.name && (
+              <p className="text-md font-medium leading-none">
+                {profile?.name}
+              </p>
+            )}
+            {profile?.nip05 && (
               <p className="text-sm leading-none text-muted-foreground">
-                {nip05}
+                {profile?.nip05}
               </p>
             )}
           </div>
@@ -94,10 +104,6 @@ export function UserNav({ name, nip05, imageUrl }: any) {
 export function NavbarV2({ label, backTo }: any) {
   const { activeUser } = useActiveUser();
 
-  // TO-DO: Optimize this
-  const filters = useMemo(() => activeUser?.pubkey, [activeUser?.pubkey]);
-  const { profile } = useProfile({ pubkey: filters });
-
   return (
     <div className="flex flex-col bg-black border-b-[1px] border-border">
       <div className="flex flex-col w-full max-w-[720px] mx-auto px-4">
@@ -116,11 +122,7 @@ export function NavbarV2({ label, backTo }: any) {
             <span className="text-sm text-muted-foreground">Eventro</span>
           </div>
           <div className="flex flex-col items-start">
-            <UserNav
-              name={profile?.name}
-              nip05={profile?.nip05}
-              imageUrl={profile?.image}
-            />
+            <UserNav pubkey={activeUser?.pubkey} />
             {/* <ul>
               <li>
                 <Button size="sm" variant="outline" asChild>

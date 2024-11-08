@@ -117,10 +117,6 @@ export default function Page() {
   // const sortedEvents = events.sort((a, b) => Number(a.start) - Number(b.start));
   const { activeUser } = useActiveUser();
 
-  console.log('activeUser', activeUser);
-
-  // if (!activeUser) return null;
-
   const urlKey = useCallback(() => {
     return `/api/event/getAll?pubkey=${activeUser?.pubkey}`;
   }, [activeUser?.pubkey]);
