@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { id, tx } from '@instantdb/admin';
 
-import { prisma } from '@/services/prismaClient';
 import { AppError } from '@/lib/errors/appError';
+import { db } from '@/config/instantdb';
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {
@@ -9,16 +10,6 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, email, pubkey } = await req.json();
-
-  // if (!pubkey) {
-  //   return NextResponse.json(
-  //     {
-  //       status: false,
-  //       error: 'Pubkey is required',
-  //     },
-  //     { status: 400 }
-  //   );
-  // }
 
   if (!pubkey && (!email || !name)) {
     return NextResponse.json(
@@ -30,31 +21,46 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  try {
-    const isExist = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+  const now = Date.now();
 
-    if (isExist) {
+  try {
+    // Find if user exist
+    const query = {
+      users: {
+        $: {
+          where: {
+            email,
+          },
+        },
+      },
+    };
+
+    const { users } = await db.query(query);
+
+    // If exist, return user
+    if (users && users?.length > 0) {
+      const user = users[0];
+
       return NextResponse.json({
         status: true,
-        data: { id: isExist?.id },
+        data: { id: user?.id },
       });
     }
 
-    const user = await prisma.user.create({
-      data: {
+    // If not exist, create
+    const newId = id();
+    await db.transact(
+      tx.users[newId].update({
         name: name || null,
         email: email || null,
         pubkey: pubkey || null,
-      },
-    });
+        createdAt: now,
+      })
+    );
 
     return NextResponse.json({
       status: true,
-      data: { id: user?.id },
+      data: { id: newId },
     });
   } catch (error: any) {
     return NextResponse.json(

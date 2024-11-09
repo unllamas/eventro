@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { id, tx } from '@instantdb/admin';
 
-import { prisma } from '@/services/prismaClient';
 import { AppError } from '@/lib/errors/appError';
+import { db } from '@/config/instantdb';
+
+const FEE = Number(process.env.FEE_VALUE_NUMBER);
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {
@@ -51,11 +54,19 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const ticket = await prisma.ticket.findUnique({
-      where: {
-        id: ticketId as string,
+    // Find if user exist
+    const query = {
+      tickets: {
+        $: {
+          where: {
+            id: ticketId,
+          },
+        },
       },
-    });
+    };
+
+    const { tickets } = await db.query(query);
+    const ticket = tickets[0];
 
     if (!ticket)
       return NextResponse.json(
@@ -63,22 +74,38 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
-    const ticketAmount = ticket?.amount || 0;
+    const total =
+      Number((quantity * ticket?.amount).toFixed(0)) +
+      Number((quantity * ticket?.amount * (FEE / 100)).toFixed(0));
 
-    const order = await prisma.order.create({
-      data: {
-        quantity: quantity as number,
-        amount: (ticketAmount * quantity) as number,
+    const service = Number((total * (FEE / 100)).toFixed(0));
+
+    // If not exist, create
+    const newId = id();
+    const now = Date.now();
+
+    await db.transact(
+      tx.orders[newId].update({
+        // Data
+        quantity,
+        amount: total,
         paid: false,
 
+        // Relations
         userId,
+        ticketId,
         eventId,
-      },
-    });
+        zapId: '',
+
+        // Status
+        updatedAt: now,
+        createdAt: now,
+      })
+    );
 
     return NextResponse.json({
       status: true,
-      data: order,
+      data: { id: newId },
     });
   } catch (error: any) {
     return NextResponse.json(
