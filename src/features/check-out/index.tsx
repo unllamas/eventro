@@ -171,8 +171,6 @@ export function CheckOut(props: any) {
 
       const { id: orderId } = order?.data;
 
-      console.log('orderId', orderId);
-
       if (!orderId) return null;
 
       const dataPayment = {
@@ -201,11 +199,9 @@ export function CheckOut(props: any) {
         behavior: 'auto',
       });
 
-      console.log('payment?.data', payment?.data);
-
       const { pr, verify } = payment?.data;
-      setPaymentRequest(pr);
 
+      setPaymentRequest(pr);
       setScreen('payment');
     } catch (error) {
       console.log('error', error);

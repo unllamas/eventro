@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { tx } from '@instantdb/admin';
 import { randomBytes } from 'crypto';
-import { Event, EventTemplate, finalizeEvent, getPublicKey } from 'nostr-tools';
+import {
+  Event,
+  EventTemplate,
+  finalizeEvent,
+  getPublicKey,
+  Relay,
+  verifyEvent,
+} from 'nostr-tools';
 
 import { AppError } from '@/lib/errors/appError';
 import { getLnurlpFromWalias } from '@/services/ln';
@@ -81,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const service = Number((total * (FEE / 100)).toFixed(0));
 
-    // Zap request
+    // Generate structure for zap request
     const unsignedZapRequest: EventTemplate = {
       kind: 9734,
       tags: [
@@ -94,10 +101,12 @@ export async function POST(req: NextRequest) {
       created_at: Math.round(Date.now() / 1000),
     };
 
+    // Firm event
     const privateKey = Uint8Array.from(Buffer.from(SIGNER, 'hex'));
     const zapRequest: Event = finalizeEvent(unsignedZapRequest, privateKey);
 
-    if (!zapRequest?.sig) {
+    let isGood = verifyEvent(zapRequest);
+    if (!isGood) {
       return NextResponse.json({
         status: false,
         error: 'Zap request not found',
@@ -105,6 +114,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    console.log('zapRequest', zapRequest);
+    // Publish event on Nostr
+    const relay = await Relay.connect('wss://nostr-pub.wellorder.net');
+    const test = await relay.publish(zapRequest);
+    console.log('test', test);
+    relay.close();
+
+    // Update order with id for zap request
     await db.transact(
       tx.orders[orderId].update({
         // Relations
@@ -116,8 +133,10 @@ export async function POST(req: NextRequest) {
     );
 
     // Lnurlp
-    const posWalias = 'dios@lawallet.ar'!;
-    const lnurlp = await getLnurlpFromWalias(posWalias);
+    // TO-DO: get lud16 from pubkey on Event
+    // if not found, return error
+    const lud16 = 'dios@lawallet.ar'!;
+    const lnurlp = await getLnurlpFromWalias(lud16);
 
     if (!lnurlp) {
       // return NextResponse.json({
