@@ -51,6 +51,7 @@ import { Card } from '@/components/ui/card';
 import { createUnixTimestamp } from '@/lib/utils';
 import { NavbarV2 } from '@/components/navbar';
 import { useActiveUser } from 'nostr-hooks';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Page() {
   const [eventDetails, setEventDetails] = useState<EventDetails>({
@@ -77,6 +78,7 @@ export default function Page() {
 
   // Libs and hooks
   const router = useRouter();
+  const { toast } = useToast();
   const { activeUser } = useActiveUser();
 
   if (!activeUser) return null;
@@ -139,6 +141,21 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !eventDetails.title ||
+      !activeUser?.pubkey ||
+      !eventDetails?.tickets?.length
+    ) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops...',
+        description: 'Something went wrong.',
+        duration: 2400,
+      });
+      return null;
+    }
+
     setLoading(true);
 
     const eventData = {
@@ -166,15 +183,17 @@ export default function Page() {
 
       if (!response?.ok) {
         setLoading(false);
+        toast({
+          variant: 'destructive',
+          title: 'Oops...',
+          description: 'Something went wrong.',
+          duration: 2400,
+        });
 
-        console.error('Failed to create event');
         return null;
       }
 
-      const { id } = await response.json();
-      if (!id) router.push(`/dash`);
-
-      router.push(`/manage/${id}`);
+      router.push(`/dash`);
     } catch (error) {
       setLoading(false);
 
