@@ -61,11 +61,28 @@ interface OrderProps {
   updatedAt: string;
 }
 
+interface TicketSaleProps {
+  id: string;
+  reference: string;
+  bolt11: string;
+  checkIn: boolean;
+
+  // Relations
+  userId: string;
+  orderId: string;
+  eventId: string;
+
+  // Status
+  createdAt: string;
+  updatedAt: string;
+}
+
 type DbSchema = {
   events: EventProps;
   tickets: TicketProps;
   users: UserProps;
   orders: OrderProps;
+  ticketSales: TicketSaleProps;
 };
 
 const APP_ID = process.env.INSTANT_DB_APP_ID || '';
