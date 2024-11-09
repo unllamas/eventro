@@ -114,11 +114,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.log('zapRequest', zapRequest);
     // Publish event on Nostr
     const relay = await Relay.connect('wss://nostr-pub.wellorder.net');
-    const test = await relay.publish(zapRequest);
-    console.log('test', test);
+    await relay.publish(zapRequest);
+
     relay.close();
 
     // Update order with id for zap request
@@ -165,7 +164,7 @@ export async function POST(req: NextRequest) {
     // }
 
     const response = (await (await fetch(url)).json()) as any;
-    console.log('response', response);
+
     const pr = response.pr as string;
     const verify = response.verify as string;
 
