@@ -44,10 +44,28 @@ interface UserProps {
   createdAt: string;
 }
 
+interface OrderProps {
+  id: string;
+  quantity: number;
+  amount: number;
+  paid: boolean;
+
+  userId: string;
+  ticketId: string;
+  eventId: string;
+  zapId: string;
+
+  // Status
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 type DbSchema = {
   events: EventProps;
   tickets: TicketProps;
   users: UserProps;
+  orders: OrderProps;
 };
 
 const APP_ID = process.env.INSTANT_DB_APP_ID || '';
