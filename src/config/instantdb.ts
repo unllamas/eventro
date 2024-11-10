@@ -77,12 +77,24 @@ interface TicketSaleProps {
   updatedAt: string;
 }
 
+interface ModeratorProps {
+  id: string;
+  userId: string;
+  eventId: string;
+
+  // Status
+  status: 'active' | 'inactive';
+  updatedAt: string;
+  createdAt: string;
+}
+
 type DbSchema = {
   events: EventProps;
   tickets: TicketProps;
   users: UserProps;
   orders: OrderProps;
   ticketSales: TicketSaleProps;
+  moderators: ModeratorProps;
 };
 
 const APP_ID = process.env.INSTANT_DB_APP_ID || '';
