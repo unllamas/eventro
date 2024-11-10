@@ -1,17 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ArrowUpRight,
-  ChevronLeft,
-  PencilIcon,
-  PlusIcon,
-  ScanLine,
-  TicketPlus,
-  Trash2,
-  UserPlus,
-} from 'lucide-react';
+import useSWR from 'swr';
+import { ArrowUpRight, PlusIcon, ScanLine, UserPlus } from 'lucide-react';
+import { useProfile } from 'nostr-hooks';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,15 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-
-import { EVENT_MOCK, ORDERS_MOCK, TICKETS_MOCK } from '@/mock';
-import { Separator } from '@/components/ui/separator';
-
-import { prisma } from '@/services/prismaClient';
 import { NavbarV2 } from '@/components/navbar';
-import { useActiveUser, useProfile } from 'nostr-hooks';
-import { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import fetcher from '@/config/fetcher';
 
 const UserOrganizer = ({ pubkey }: { pubkey: string }) => {
   // TO-DO: Optimize this
@@ -75,22 +62,23 @@ const UserOrganizer = ({ pubkey }: { pubkey: string }) => {
   );
 };
 
-export function Manage(props: {
-  event: any;
-  ticket: any;
-  orders: any;
-  sales: any;
-}) {
-  const { event, ticket, orders, sales } = props;
+export function Manage(props: { id: string }) {
+  const { id } = props;
 
-  const paid =
-    (Number(orders?.filter((order: any) => order?.paid)?.length) * 100) /
-    Number(orders?.length);
+  const { data } = useSWR(`/api/event/get?id=${id}`, fetcher);
 
-  const attandance = (
-    (Number(sales?.filter((sale: any) => sale.checkIn).length) * 100) /
-    Number(sales?.length)
-  ).toFixed(0);
+  if (!!!data) return null;
+
+  const { event, ticket } = data;
+
+  // const paid =
+  //   (Number(orders?.filter((order: any) => order?.paid)?.length) * 100) /
+  //   Number(orders?.length);
+
+  // const attandance = (
+  //   (Number(sales?.filter((sale: any) => sale.checkIn).length) * 100) /
+  //   Number(sales?.length)
+  // ).toFixed(0);
 
   return (
     <div className="w-full min-h-screen bg-background">
@@ -169,7 +157,7 @@ export function Manage(props: {
                   {!!ticket?.quantity && ticket?.quantity > 0 && (
                     <p className="flex items-center gap-1 text-sm">
                       <span className="text-lg font-semibold">
-                        {sales?.length}
+                        {/* {sales?.length} */}0
                       </span>
                       {ticket?.quantity && ' / '}
                       <span className="font-semibold text-sm text-muted-foreground">
@@ -189,26 +177,26 @@ export function Manage(props: {
             <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Orders</p>
-                <p className="text-xl font-bold">{orders?.length}</p>
+                {/* <p className="text-xl font-bold">{orders?.length}</p> */}
               </CardContent>
             </Card>
             <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Paid</p>
-                <p className="text-xl font-bold">{!!paid ? paid : 0}%</p>
+                {/* <p className="text-xl font-bold">{!!paid ? paid : 0}%</p> */}
               </CardContent>
             </Card>
             <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Sold</p>
-                <p className="text-xl font-bold">{sales?.length || 0}</p>
+                {/* <p className="text-xl font-bold">{sales?.length || 0}</p> */}
               </CardContent>
             </Card>
             <Card className="flex-1 bg-black border-[1px] border-dashed border-white/20">
               <CardContent>
                 <p className="text-sm text-muted-foreground">Attendance</p>
                 <p className="text-xl font-bold">
-                  {!!!attandance ? attandance : 0}%
+                  {/* {!!!attandance ? attandance : 0}% */}
                 </p>
               </CardContent>
             </Card>
@@ -226,7 +214,7 @@ export function Manage(props: {
               </p> */}
             </div>
             {/* Add moderator */}
-            {/* <Dialog>
+            <Dialog>
               <DialogTrigger asChild>
                 <Button size="sm" variant="secondary">
                   <PlusIcon className="w-4 h-4 mr-1" /> Add
@@ -273,7 +261,7 @@ export function Manage(props: {
                   </Button>
                 </div>
               </DialogContent>
-            </Dialog> */}
+            </Dialog>
           </div>
           <div className="overflow-hidden flex flex-col rounded-xl border">
             <UserOrganizer pubkey={event?.pubkey} />

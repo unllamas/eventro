@@ -2,15 +2,10 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { Event } from 'nostr-tools';
-import {
-  CircleCheck,
-  CircleDashed,
-  CircleX,
-  ArrowLeftIcon,
-  ChevronLeft,
-} from 'lucide-react';
 import useSWR from 'swr';
+import { useZap } from '@lawallet/react';
+import { EventTemplate, finalizeEvent } from 'nostr-tools';
+import { useNewEvent, useSigner } from 'nostr-hooks';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -40,6 +35,7 @@ import {
 
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import fetcher from '@/config/fetcher';
 
 // Generic
 import { FormCustomer } from '@/features/form-customer';
@@ -52,10 +48,6 @@ import { PlusIcon } from '@/components/icons/PlusIcon';
 import { MinusIcon } from '@/components/icons/MinusIcon';
 
 import { SatoshiIcon } from '@/components/icons/Satoshi';
-import { useZap } from '@lawallet/react';
-import { config } from '@/config/config';
-import fetcher from '@/config/fetcher';
-import { Badge } from '@/components/ui/badge';
 
 const TICKET_MOCK = {
   title: 'General',
@@ -69,7 +61,11 @@ const MAX_TICKETS = parseInt(process.env.NEXT_MAX_TICKETS || '0', 10); // Get th
 const FEE = Number(process.env.FEE_VALUE); // Get the fee from env
 
 export function CheckOut(props: any) {
-  const { event, ticket, ticketsSales } = props;
+  const { id } = props;
+
+  const { data } = useSWR(`/api/check-out/get?id=${id}`, fetcher);
+  const { createNewEvent } = useNewEvent();
+  const { signer } = useSigner();
 
   // Flow
   const [screen, setScreen] = useState<string>('information');
@@ -96,68 +92,121 @@ export function CheckOut(props: any) {
   const [userId, setUserId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
 
-  const { toast } = useToast();
-  const { invoice, createZapInvoice, resetInvoice } = useZap({
-    receiverPubkey: event?.pubkey,
-    config,
-  });
+  // const urlKey = useCallback(() => {
+  //   return `/api/ticket/count?id=${data?.event?.id}`;
+  // }, [data]);
 
-  const urlKey = useCallback(() => {
-    return `/api/ticket/count?id=${event?.id}`;
-  }, [event]);
+  // Validations
+  if (!data) return null;
+  const { event, ticket } = data;
 
-  const { data: ticketsCount, mutate } = useSWR(urlKey, fetcher);
+  const total =
+    Number((ticketQuantity * ticket?.amount).toFixed(0)) +
+    Number((ticketQuantity * ticket?.amount * (FEE / 100)).toFixed(0));
 
-  const handleCreateOrder = useCallback(
-    async (id: string) => {
-      try {
-        const data = {
-          quantity: ticketQuantity,
-          userId: id,
-          ticketId: ticket?.id,
-          eventId: event?.id,
-        };
+  const service = Number((total * (FEE / 100)).toFixed(0));
 
-        const response = await fetch('/api/order/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }).then((res) => res.json());
+  // const { data: ticketsCount, mutate } = useSWR(urlKey, fetcher);
 
-        if (!response.status) {
-          throw new Error(response.error);
-        }
+  // Libs and hooks
+  // const { toast } = useToast();
+  // const { invoice, createZapInvoice, resetInvoice } = useZap({
+  //   receiverPubkey: event?.pubkey,
+  //   config,
+  // });
 
-        setOrderId(response?.data?.id);
-      } catch (error) {
-        console.log('error', error);
+  // const handleCreateOrder = useCallback(
+  //   async (id: string) => {
+  //     if (!id) return null;
+  //     try {
+  //       const data = {
+  //         quantity: ticketQuantity,
+  //         userId: id,
+  //         ticketId: ticket?.id,
+  //         eventId: event?.id,
+  //       };
+
+  //       const response = await fetch('/api/order/create', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(data),
+  //       }).then((res) => res.json());
+
+  //       if (!response.status) {
+  //         throw new Error(response.error);
+  //       }
+
+  //       setOrderId(response?.data?.id);
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   },
+  //   [ticketQuantity]
+  // );
+
+  const handleCreateInvoice = async (id: string) => {
+    setIsloading(true);
+
+    const data = {
+      ticketId: ticket?.id,
+      eventId: event?.id,
+      quantity: ticketQuantity,
+      userId: id,
+    };
+
+    try {
+      const order = await fetch('/api/order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }).then((res) => res.json());
+
+      if (!order.status) {
+        throw new Error(order.error);
       }
-    },
-    [ticketQuantity]
-  );
 
-  const handleCreateInvoice = () => {
-    const value = ticketQuantity * ticket?.amount;
-    createZapInvoice(value)
-      .then((bolt11: string | undefined) => {
-        if (!bolt11) {
-          console.log('upds, algo paso mal');
-          return;
-        }
+      const { id: orderId } = order?.data;
 
-        window.scrollTo({
-          top: 0,
-          behavior: 'auto',
-        });
+      if (!orderId) return null;
 
-        setScreen('payment');
+      const dataPayment = {
+        ticketId: ticket?.id,
+        eventId: event?.id,
+        quantity: ticketQuantity,
+        userId: id,
+        orderId: orderId,
+      };
+
+      const payment = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataPayment),
+      }).then((res) => res.json());
+
+      if (!payment.status) {
         setIsloading(false);
-      })
-      .catch((error: any) => {
-        console.log('handleCreateInvoice error', error);
+        throw new Error(payment.error);
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
       });
+
+      const { pr, verify } = payment?.data;
+
+      setPaymentRequest(pr);
+      setScreen('payment');
+    } catch (error) {
+      console.log('error', error);
+      setIsloading(false);
+    }
   };
 
   const handleCreateUser = async (data: {
@@ -167,15 +216,15 @@ export function CheckOut(props: any) {
   }) => {
     if ((!data?.email || !data?.name) && !data?.pubkey) return null;
 
-    if (ticket?.quantity > 0 && ticket?.quantity - ticketsSales === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'Oops... ',
-        description: 'The tickets have just sold out.',
-        duration: 1400,
-      });
-      return null;
-    }
+    // if (ticket?.quantity > 0 && ticket?.quantity - ticketsSales === 0) {
+    //   toast({
+    //     variant: 'destructive',
+    //     title: 'Oops... ',
+    //     description: 'The tickets have just sold out.',
+    //     duration: 1400,
+    //   });
+    //   return null;
+    // }
 
     setIsloading(true);
     setUserData({ ...data });
@@ -193,47 +242,46 @@ export function CheckOut(props: any) {
         throw new Error(response.error);
       }
 
-      handleCreateInvoice();
-
       const { id } = response?.data;
       setUserId(id);
+      handleCreateInvoice(id);
 
-      handleCreateOrder(id);
+      // handleCreateOrder(id);
     } catch (error) {
       console.log('error', error);
       setIsloading(false);
     }
   };
 
-  async function handleCreateTicket() {
-    try {
-      const data = {
-        bolt11: invoice?.bolt11,
-        userId,
-        orderId,
-        eventId: event?.id,
-      };
+  // async function handleCreateTicket() {
+  //   try {
+  //     const data = {
+  //       // bolt11: invoice?.bolt11,
+  //       userId,
+  //       orderId,
+  //       eventId: event?.id,
+  //     };
 
-      const response = await fetch('/api/ticket/claim', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }).then((res) => res.json());
+  //     const response = await fetch('/api/ticket/claim', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(data),
+  //     }).then((res) => res.json());
 
-      mutate();
-      setScreen('summary');
-    } catch (error) {
-      console.log('error', error);
-    }
-  }
+  //     // mutate();
+  //     setScreen('summary');
+  //   } catch (error) {
+  //     console.log('error', error);
+  //   }
+  // }
 
-  useEffect(() => {
-    if (invoice.payed) {
-      handleCreateTicket();
-    }
-  }, [invoice.payed, orderId]);
+  // useEffect(() => {
+  //   if (invoice.payed) {
+  //     handleCreateTicket();
+  //   }
+  // }, [invoice.payed, orderId]);
 
   return (
     <>
@@ -282,181 +330,119 @@ export function CheckOut(props: any) {
                         </p>
                       )}
                     </div>
-                    {(ticket?.quantity === 0 ||
-                      ticketsSales !== ticket?.quantity) && (
-                      <>
-                        <Card className="p-4 bg-background">
-                          <div className="flex justify-between items-center gap-4">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h2 className="text-md">{ticket?.title}</h2>
-                                {ticket?.quantity > 0 &&
+                    <>
+                      <Card className="p-4 bg-background">
+                        <div className="flex justify-between items-center gap-4">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h2 className="text-md">{ticket?.title}</h2>
+                              {/* {ticket?.quantity > 0 &&
                                   ticket?.quantity - ticketsSales < 4 && (
                                     <Badge variant="destructive">
                                       {ticket?.quantity - ticketsSales} left
                                     </Badge>
-                                  )}
-                              </div>
-                              {ticket?.amount === 0 ? (
-                                <p className="flex items-center gap-1 font-semibold text-lg">
-                                  Free
-                                </p>
-                              ) : (
-                                <div className="flex items-center gap-1">
-                                  <div className="w-6 h-6 text-muted-foreground">
-                                    <SatoshiIcon />
-                                  </div>
-                                  <p className="flex items-center gap-1 font-semibold text-lg">
-                                    {ticket?.amount}
-                                  </p>
-                                </div>
-                              )}
+                                  )} */}
                             </div>
-                            <div className="flex gap-2 items-center">
-                              <Button
-                                variant={
-                                  screen !== 'information' ||
-                                  ticketQuantity === 1
-                                    ? 'ghost'
-                                    : 'secondary'
-                                }
-                                size="icon"
-                                onClick={() =>
-                                  setTicketQuantity(ticketQuantity - 1)
-                                }
-                                disabled={
-                                  screen !== 'information' ||
-                                  ticketQuantity === 1
-                                }
-                              >
-                                <MinusIcon />
-                              </Button>
-                              <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
-                                {screen !== 'information' && (
-                                  <span className="font-normal text-xs text-text">
-                                    x
-                                  </span>
-                                )}
-                                {ticketQuantity}
+                            {ticket?.amount === 0 ? (
+                              <p className="flex items-center gap-1 font-semibold text-lg">
+                                Free
                               </p>
-                              <Button
-                                variant={
-                                  screen !== 'information' ||
-                                  (ticket?.quantity !== 0 &&
-                                    ticket?.amount === 0 &&
-                                    ticketQuantity === 1)
-                                    ? 'ghost'
-                                    : 'secondary'
-                                }
-                                size="icon"
-                                onClick={() =>
-                                  setTicketQuantity(ticketQuantity + 1)
-                                }
-                                disabled={
-                                  ticket?.quantity === ticketsSales ||
-                                  screen !== 'information' ||
-                                  (ticket?.amount === 0 && ticketQuantity === 1)
-                                }
-                              >
-                                <PlusIcon />
-                              </Button>
-                            </div>
-                          </div>
-                        </Card>
-                        <div className="flex flex-col gap-4 p-4">
-                          {/* Code */}
-                          {/* <div className="flex items-center justify-between gap-2">
-                        <Label htmlFor="code">Code</Label>
-                        <div className="relative">
-                          <Input
-                            type="text"
-                            id="code"
-                            name="code"
-                            placeholder="Code"
-                            onChange={(e) => setCode(e.target.value)}
-                          />
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                            {code && !!codeStatus && (
-                              <>
-                                {codeStatus === 'valid' && (
-                                  <span className="text-green-500">
-                                    <CircleCheck />
-                                  </span>
-                                )}
-                                {codeStatus === 'invalid' && (
-                                  <span className="text-red-500">
-                                    <CircleX />
-                                  </span>
-                                )}
-                                {codeStatus === 'loading' && (
-                                  <span className="text-gray-500">
-                                    <CircleDashed />
-                                  </span>
-                                )}
-                              </>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <div className="w-6 h-6 text-muted-foreground">
+                                  <SatoshiIcon />
+                                </div>
+                                <p className="flex items-center gap-1 font-semibold text-lg">
+                                  {ticket?.amount}
+                                </p>
+                              </div>
                             )}
                           </div>
-                        </div>
-                      </div> */}
-                          {/* Comision */}
-                          {ticket?.amount !== 0 && (
-                            <div className="flex gap-4 justify-between items-center">
-                              <div className="flex flex-col">
-                                <p className="text-text">
-                                  Service{' '}
-                                  <span className="text-sm">({FEE}%)</span>
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-1 text-right">
-                                <div className="w-6 h-6 text-muted-foreground">
-                                  <SatoshiIcon />
-                                </div>
-                                <p className="font-bold text-md">
-                                  {(
-                                    ticketQuantity *
-                                    ticket?.amount *
-                                    0.042
-                                  ).toFixed(0)}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                          {/* Total */}
-                          {ticket?.amount !== 0 && (
-                            <div className="flex gap-4 justify-between items-center">
-                              <div className="flex flex-col">
-                                {/* {discountMultiple !== 1 && (
-                            <p className="text-sm text-primary">
-                              {((1 - discountMultiple) * 100).toFixed(0)}
-                              {'% OFF'}
+                          <div className="flex gap-2 items-center">
+                            <Button
+                              variant={
+                                screen !== 'information' || ticketQuantity === 1
+                                  ? 'ghost'
+                                  : 'secondary'
+                              }
+                              size="icon"
+                              onClick={() =>
+                                setTicketQuantity(ticketQuantity - 1)
+                              }
+                              disabled={
+                                screen !== 'information' || ticketQuantity === 1
+                              }
+                            >
+                              <MinusIcon />
+                            </Button>
+                            <p className="flex items-center justify-center gap-1 w-[40px] font-semibold">
+                              {screen !== 'information' && (
+                                <span className="font-normal text-xs text-text">
+                                  x
+                                </span>
+                              )}
+                              {ticketQuantity}
                             </p>
-                          )} */}
-                                <p className="text-text">Total</p>
-                              </div>
-                              <div className="flex items-center gap-1 text-right">
-                                {/* {discountMultiple !== 1 && (
-                            <p className="flex items-center gap-1 line-through text-text">
-                              {Math.round(totalSats / discountMultiple)}
-                              <span className="text-sm text-muted-foreground font-normal">
-                                {TICKET_MOCK?.currency}
-                              </span>
-                            </p>
-                          )} */}
-                                <div className="w-6 h-6 text-muted-foreground">
-                                  <SatoshiIcon />
-                                </div>
-                                <p className="flex items-center gap-1 font-bold text-md">
-                                  {(
-                                    ticketQuantity * ticket?.amount +
-                                    ticketQuantity * ticket?.amount * 0.042
-                                  ).toFixed(0)}
-                                </p>
-                              </div>
-                            </div>
-                          )}
+                            <Button
+                              variant={
+                                screen !== 'information' ||
+                                (ticket?.quantity !== 0 &&
+                                  ticket?.amount === 0 &&
+                                  ticketQuantity === 1)
+                                  ? 'ghost'
+                                  : 'secondary'
+                              }
+                              size="icon"
+                              onClick={() =>
+                                setTicketQuantity(ticketQuantity + 1)
+                              }
+                              disabled={
+                                // ticket?.quantity === ticketsSales ||
+                                screen !== 'information' ||
+                                (ticket?.amount === 0 && ticketQuantity === 1)
+                              }
+                            >
+                              <PlusIcon />
+                            </Button>
+                          </div>
                         </div>
-                      </>
-                    )}
+                      </Card>
+                      <div className="flex flex-col gap-4 p-4">
+                        {/* Comision */}
+                        {ticket?.amount !== 0 && (
+                          <div className="flex gap-4 justify-between items-center">
+                            <div className="flex flex-col">
+                              <p className="text-text">
+                                Service{' '}
+                                <span className="text-sm">({FEE}%)</span>
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1 text-right">
+                              <div className="w-6 h-6 text-muted-foreground">
+                                <SatoshiIcon />
+                              </div>
+                              <p className="font-bold text-md">{service}</p>
+                            </div>
+                          </div>
+                        )}
+                        {/* Total */}
+                        {ticket?.amount !== 0 && (
+                          <div className="flex gap-4 justify-between items-center">
+                            <div className="flex flex-col">
+                              <p className="text-text">Total</p>
+                            </div>
+                            <div className="flex items-center gap-1 text-right">
+                              <div className="w-6 h-6 text-muted-foreground">
+                                <SatoshiIcon />
+                              </div>
+                              <p className="flex items-center gap-1 font-bold text-md">
+                                {total}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   </>
                 )}
               </>
@@ -475,7 +461,7 @@ export function CheckOut(props: any) {
                           <div className="w-6 h-6 text-muted-foreground">
                             <SatoshiIcon />
                           </div>
-                          {ticketQuantity * ticket?.amount}
+                          {total}
                         </p>
                       </div>
                     </AccordionTrigger>
@@ -485,12 +471,6 @@ export function CheckOut(props: any) {
                           <div>
                             <div className="flex items-center gap-2">
                               <h2 className="text-md">{ticket?.title}</h2>
-                              {ticket?.quantity > 0 &&
-                                ticket?.quantity - ticketsSales < 4 && (
-                                  <Badge variant="destructive">
-                                    {ticket?.quantity - ticketsSales} left
-                                  </Badge>
-                                )}
                             </div>
                             {ticket?.amount === 0 ? (
                               <p className="flex items-center gap-1 font-semibold text-lg">
@@ -532,11 +512,7 @@ export function CheckOut(props: any) {
                                 <SatoshiIcon />
                               </div>
                               <p className="flex items-center gap-1 font-bold text-md">
-                                {(
-                                  ticketQuantity *
-                                  ticket?.amount *
-                                  0.042
-                                ).toFixed(0)}
+                                {service}
                               </p>
                             </div>
                           </div>
@@ -545,28 +521,14 @@ export function CheckOut(props: any) {
                         {ticket?.amount !== 0 && (
                           <div className="flex gap-4 justify-between items-center">
                             <div className="flex flex-col">
-                              {/* {discountMultiple !== 1 && (
-                              <p className="text-sm text-primary">
-                                {((1 - discountMultiple) * 100).toFixed(0)}
-                                {'% OFF'}
-                              </p>
-                            )} */}
                               <p className="text-text text-md">Total</p>
                             </div>
                             <div className="flex items-center gap-1 text-right">
-                              {/* {discountMultiple !== 1 && (
-                              <p className="line-through text-text">
-                                {Math.round(totalSats / discountMultiple)}
-                              </p>
-                            )} */}
                               <div className="w-6 h-6 text-muted-foreground">
                                 <SatoshiIcon />
                               </div>
                               <p className="flex items-center gap-1 font-bold text-md">
-                                {(
-                                  ticketQuantity * ticket?.amount +
-                                  ticketQuantity * ticket?.amount * 0.042
-                                ).toFixed(0)}
+                                {total}
                               </p>
                             </div>
                           </div>
@@ -602,11 +564,6 @@ export function CheckOut(props: any) {
                       <div>
                         <div className="flex items-center gap-2">
                           <h2 className="text-md">{ticket?.title}</h2>
-                          {ticket?.quantity - ticketsSales < 4 && (
-                            <Badge variant="destructive">
-                              {ticket?.quantity - ticketsSales} left
-                            </Badge>
-                          )}
                         </div>
                         {ticket?.amount === 0 ? (
                           <p className="font-semibold text-lg">Free</p>
@@ -643,9 +600,7 @@ export function CheckOut(props: any) {
                             <SatoshiIcon />
                           </div>
                           <p className="flex items-center gap-1 font-bold text-md">
-                            {(ticketQuantity * ticket?.amount * 0.042).toFixed(
-                              0
-                            )}
+                            {service}
                           </p>
                         </div>
                       </div>
@@ -654,28 +609,14 @@ export function CheckOut(props: any) {
                     {ticket?.amount !== 0 && (
                       <div className="flex gap-4 justify-between items-center">
                         <div className="flex flex-col">
-                          {/* {discountMultiple !== 1 && (
-                              <p className="text-sm text-primary">
-                                {((1 - discountMultiple) * 100).toFixed(0)}
-                                {'% OFF'}
-                              </p>
-                            )} */}
                           <p className="text-text text-md">Total</p>
                         </div>
                         <div className="flex items-center gap-1 text-right">
-                          {/* {discountMultiple !== 1 && (
-                              <p className="line-through text-text">
-                                {Math.round(totalSats / discountMultiple)}
-                              </p>
-                            )} */}
                           <div className="w-6 h-6 text-muted-foreground">
                             <SatoshiIcon />
                           </div>
                           <p className="flex items-center gap-1 font-bold text-md">
-                            {(
-                              ticketQuantity * ticket?.amount +
-                              ticketQuantity * ticket?.amount * 0.042
-                            ).toFixed(0)}
+                            {total}
                           </p>
                         </div>
                       </div>
@@ -689,74 +630,64 @@ export function CheckOut(props: any) {
         {/* Section data */}
         <section className="relative flex flex-1 md:flex-auto w-full justify-center md:pr-4">
           <div className="flex flex-col gap-4 px-4 w-full py-4 max-w-[520px] pt-[80px]">
-            {(ticket?.quantity === 0 || ticketsSales !== ticket?.quantity) && (
-              <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
-                <div className="w-full max-w-[520px]">
-                  <Breadcrumb>
-                    <BreadcrumbList>
-                      <BreadcrumbItem>
-                        <BreadcrumbPage
-                          className={cn(
-                            '',
-                            screen === 'information'
-                              ? 'text-white'
-                              : 'text-text'
-                          )}
-                        >
-                          Information
-                        </BreadcrumbPage>
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                      {ticket?.amount !== 0 && (
-                        <>
-                          <BreadcrumbItem>
-                            <BreadcrumbPage
-                              className={cn(
-                                '',
-                                screen === 'payment'
-                                  ? 'text-white'
-                                  : 'text-text'
-                              )}
-                            >
-                              Payment
-                            </BreadcrumbPage>
-                          </BreadcrumbItem>
-                          <BreadcrumbSeparator />
-                        </>
-                      )}
-                      <BreadcrumbItem>
-                        <BreadcrumbPage
-                          className={cn(
-                            '',
-                            screen === 'summary' ? 'text-white' : 'text-text'
-                          )}
-                        >
-                          Summary
-                        </BreadcrumbPage>
-                      </BreadcrumbItem>
-                    </BreadcrumbList>
-                  </Breadcrumb>
-                </div>
+            <div className="absolute top-0 left-0 w-full h-[60px] flex justify-center items-center mx-auto  px-4 border-b-[1px] border-border">
+              <div className="w-full max-w-[520px]">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbPage
+                        className={cn(
+                          '',
+                          screen === 'information' ? 'text-white' : 'text-text'
+                        )}
+                      >
+                        Information
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    {ticket?.amount !== 0 && (
+                      <>
+                        <BreadcrumbItem>
+                          <BreadcrumbPage
+                            className={cn(
+                              '',
+                              screen === 'payment' ? 'text-white' : 'text-text'
+                            )}
+                          >
+                            Payment
+                          </BreadcrumbPage>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                      </>
+                    )}
+                    <BreadcrumbItem>
+                      <BreadcrumbPage
+                        className={cn(
+                          '',
+                          screen === 'summary' ? 'text-white' : 'text-text'
+                        )}
+                      >
+                        Summary
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
               </div>
-            )}
+            </div>
 
             {screen === 'information' && (
               <FormCustomer
                 onSubmit={handleCreateUser}
                 loading={isLoading}
                 eventId={event?.id}
-                soldOut={
-                  ticket?.quantity > 0 && ticketsSales === ticket?.quantity
-                }
+                soldOut={false}
                 // discountMultiple={discountMultiple}
                 // isCodeLoading={isCodeLoading}
                 // setCode={setCode}
               />
             )}
 
-            {screen === 'payment' && (
-              <FormPayment invoice={invoice?.bolt11.toUpperCase()} />
-            )}
+            {screen === 'payment' && <FormPayment invoice={paymentRequest} />}
 
             {screen === 'summary' && (
               <>

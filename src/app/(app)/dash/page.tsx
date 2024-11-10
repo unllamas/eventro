@@ -102,26 +102,15 @@ function EventCard(props: {
 }
 
 export default function Page() {
-  const pubkey = 'user_pubkey_here'; // Replace with actual user pubkey
-  const currentTime = Math.floor(Date.now() / 1000);
-
-  // const events = await prisma.event.findMany({
-  //   where: {
-  //     pubkey: pubkey as string,
-  //     end: {
-  //       gte: String(currentTime),
-  //     },
-  //   },
-  // });
-
-  // const sortedEvents = events.sort((a, b) => Number(a.start) - Number(b.start));
   const { activeUser } = useActiveUser();
 
   const urlKey = useCallback(() => {
     return `/api/event/getAll?pubkey=${activeUser?.pubkey}`;
-  }, [activeUser?.pubkey]);
+  }, [activeUser]);
 
-  const { data: events } = useSWR(urlKey, fetcher);
+  const { data } = useSWR(urlKey, fetcher);
+
+  if (!activeUser?.pubkey) return null;
 
   return (
     <div className="w-full min-h-screen bg-background">
@@ -153,16 +142,18 @@ export default function Page() {
           </div> */}
           {/* Events */}
           <div className="flex flex-col gap-8 w-full">
-            {events?.data?.map((event: any, index: number) => (
-              <EventCard
-                key={index}
-                id={event?.id}
-                label={event?.title}
-                start={Number(event?.start)}
-                isOnline={true}
-                // image={event?.image || ''}
-              />
-            ))}
+            {data &&
+              data?.length > 0 &&
+              data?.map((event: any, index: number) => (
+                <EventCard
+                  key={index}
+                  id={event?.id}
+                  label={event?.title}
+                  start={Number(event?.start)}
+                  isOnline={true}
+                  // image={event?.image || ''}
+                />
+              ))}
           </div>
         </div>
         {/* Tomorrow */}

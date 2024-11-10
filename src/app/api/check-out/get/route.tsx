@@ -14,22 +14,28 @@ export async function GET(req: NextRequest) {
     events: {
       $: {
         where: {
-          id,
-        },
-      },
-    },
-    tickets: {
-      $: {
-        where: {
-          eventId: id,
+          nostrId: id,
         },
       },
     },
   };
 
   try {
-    const data = await db.query(query);
-    const { events, tickets } = data;
+    const { events } = await db.query(query);
+
+    const event = events[0];
+
+    const subQuery = {
+      tickets: {
+        $: {
+          where: {
+            eventId: event?.id,
+          },
+        },
+      },
+    };
+
+    const { tickets } = await db.query(subQuery);
 
     return NextResponse.json({ event: events[0], ticket: tickets[0] });
   } catch (error: any) {

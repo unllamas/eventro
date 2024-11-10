@@ -42,7 +42,7 @@ const Loggin = (props: {
   // Flow
   const [inputValue, setInputValue] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [showInputSecret, setShowInputSecret] = useState<boolean>(false);
+  const [showInputSecret, setShowInputSecret] = useState<boolean>(true);
 
   // Libs and hooks
   const router = useRouter();
@@ -81,15 +81,15 @@ const Loggin = (props: {
     });
   };
 
-  const handleLoginWithExtension = () => {
-    loginWithExtension({
-      onSuccess: (signer: any) => {
-        signer.user().then((user: any) => {
-          setSigner(signer);
-        });
-      },
-    });
-  };
+  // const handleLoginWithExtension = () => {
+  //   loginWithExtension({
+  //     onSuccess: (signer: any) => {
+  //       signer.user().then((user: any) => {
+  //         setSigner(signer);
+  //       });
+  //     },
+  //   });
+  // };
 
   const handleShowInputSecret = () => {
     setShowInputSecret(!showInputSecret);
@@ -128,16 +128,16 @@ const Loggin = (props: {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 w-full">
-          <Button className="w-full" onClick={handleLoginWithExtension}>
+        <div className="flex flex-col gap-2 w-full">
+          {/* <Button className="w-full" onClick={handleLoginWithExtension}>
             Login with extension
-          </Button>
+          </Button> */}
 
-          <div className="flex gap-4 items-center my-2">
+          {/* <div className="flex gap-4 items-center my-2">
             <Separator className="flex-1" />
             <p className="text-sm text-muted-foreground">OR</p>
             <Separator className="flex-1" />
-          </div>
+          </div> */}
 
           {!showInputSecret ? (
             <>
@@ -149,9 +149,9 @@ const Loggin = (props: {
                 Create account
               </Button> */}
               <div className="text-sm text-center">
-                <p className="text-muted-foreground">
+                {/* <p className="text-muted-foreground">
                   Do you already have one?
-                </p>
+                </p> */}
                 <Button variant="link" onClick={handleShowInputSecret}>
                   Login with private key
                 </Button>
@@ -170,32 +170,36 @@ const Loggin = (props: {
                     value={inputValue as string}
                     onChange={(e) => setInputValue(e.target.value)}
                   />
-                  <div className="absolute top-0 right-[10px] flex items-center h-full">
+                  <div className="absolute top-0 right-[10px] flex items-center gap-1 h-full">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="outline"
+                      size="icon"
                       onClick={handleToggleVisibility}
                       title={isPasswordVisible ? 'Hide' : 'Show'}
                     >
-                      {isPasswordVisible ? <EyeOffIcon /> : <EyeIcon />}
+                      {isPasswordVisible ? (
+                        <EyeOffIcon className="w-4 h-4" />
+                      ) : (
+                        <EyeIcon className="w-4 h-4" />
+                      )}
                     </Button>
                     {inputValue ? (
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant="outline"
+                        size="icon"
                         onClick={() => setInputValue('')}
                         title="Delete value"
                       >
-                        <Trash2Icon />
+                        <Trash2Icon className="w-4 h-4" />
                       </Button>
                     ) : (
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant="outline"
+                        size="icon"
                         onClick={handlePasteInput}
                         title="Paste from clipboard"
                       >
-                        <ClipboardCopyIcon />
+                        <ClipboardCopyIcon className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
@@ -209,13 +213,13 @@ const Loggin = (props: {
                 >
                   Login
                 </Button>
-                <Button
+                {/* <Button
                   className="w-full"
                   onClick={handleShowInputSecret}
                   variant="ghost"
                 >
                   Cancel
-                </Button>
+                </Button> */}
               </div>
             </>
           )}

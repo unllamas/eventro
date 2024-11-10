@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from '@/services/prismaClient';
 import { AppError } from '@/lib/errors/appError';
+import { db } from '@/config/instantdb';
 
 export async function GET(req: NextRequest) {
   if (req.method !== 'GET') {
@@ -9,18 +9,21 @@ export async function GET(req: NextRequest) {
   }
 
   const pubkey = req.nextUrl.searchParams.get('pubkey');
+  const query = {
+    events: {
+      $: {
+        where: {
+          pubkey,
+        },
+      },
+    },
+  };
 
   try {
-    const events = await prisma.event.findMany({
-      where: {
-        pubkey: pubkey as string,
-      },
-    });
+    const data = await db.query(query);
+    const { events } = data;
 
-    return NextResponse.json({
-      status: true,
-      data: events,
-    });
+    return NextResponse.json(events);
   } catch (error: any) {
     console.error('Error counting events:', error);
 

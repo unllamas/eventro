@@ -12,8 +12,9 @@ async function generateInvoice(
 ): Promise<GenerateInvoiceResponse> {
   let url = `${callbackUrl}?amount=${amount}`;
 
-  if (zapEvent) {
-    const encodedZapEvent = encodeURI(JSON.stringify(zapEvent));
+  if (zapEvent?.sig) {
+    const format = JSON.stringify(zapEvent);
+    const encodedZapEvent = encodeURI(format);
 
     url += `&nostr=${encodedZapEvent}&lnurl=lnurl`;
   }

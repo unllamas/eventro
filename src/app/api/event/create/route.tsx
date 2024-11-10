@@ -1,11 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-import { redirect } from 'next/navigation';
+import { id, tx } from '@instantdb/admin';
 
-import { prisma } from '@/services/prismaClient';
 import { AppError } from '@/lib/errors/appError';
-import { revalidateTag } from 'next/cache';
+
+import { db } from '@/config/instantdb';
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {
@@ -45,37 +44,36 @@ export async function POST(req: NextRequest) {
   }
 
   const ticket = tickets[0];
+  const now = Date.now();
+  const nostrId: string = randomBytes(32).toString('hex');
 
   try {
-    const nostrId: string = randomBytes(32).toString('hex');
-
-    const createdEvent = await prisma.event.create({
-      data: {
-        title: event?.title as string,
-        description: event?.description as string,
-        start: String(event?.start),
-        end: String(event?.end),
-        pubkey: pubkey as string,
-        nostrId: nostrId as string,
+    const newIdEvent = id();
+    await db.transact(
+      tx.events[newIdEvent].update({
+        ...event,
+        pubkey,
+        nostrId,
         status: 'active',
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      })
+    );
 
-    await prisma.ticket.create({
-      data: {
-        title: ticket?.title as string,
-        description: ticket?.description as string,
-        amount: ticket?.amount ?? 0,
-        currency: 'sat',
-        quantity: ticket?.quantity ?? 0,
-        eventId: createdEvent?.id as string,
+    const newIdTicket = id();
+    await db.transact(
+      tx.tickets[newIdTicket].update({
+        ...ticket,
+        eventId: newIdEvent,
         status: 'active',
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      })
+    );
 
     return NextResponse.json({
       status: true,
-      data: { id: createdEvent?.id },
+      data: { id: newIdEvent },
     });
   } catch (error: any) {
     return NextResponse.json(
