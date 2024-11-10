@@ -28,7 +28,9 @@ nvm use
 pnpm dev
 ```
 
-## Roadmap v0.1
+## Roadmap
+
+### Q4 2024
 
 - [x] Login with Nostr
 - [x] Create Event
@@ -42,7 +44,7 @@ pnpm dev
   - [ ] Send to email
 - [ ] Check-in for TicketSale
 
-## Roadmap v0.2
+### Q1 2025
 
 - [ ] Add Coupon for Tickets
 - [ ] App mobile for Check-n
@@ -53,7 +55,7 @@ pnpm dev
 - [ ] Integrate location on create Event
 - [ ] Create internal Dashboard
 
-## Roadmap v0.3
+### Q2 2025
 
 - [ ] Events page
 - [ ] Save Event how (NIP-52)[https://github.com/nostr-protocol/nips/blob/master/52.md] for Nostr
