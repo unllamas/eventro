@@ -1,4 +1,35 @@
-## Endpoints
+# Flow endpoints
+
+- [Whitelist](#whitelist)
+- Dashboard
+  - [Create a new event](#create-a-new-event)
+  - [Get events](#get-events)
+- Manage
+  - [Get event](#get-event)
+- Check-out
+  - [Create user](#create-a-new-user)
+  - [Create order](#create-a-new-order)
+  - [Create payment](#create-new-payment)
+
+## Whitelist
+
+### Create a new user
+
+`/api/whitelist`
+
+- [x] Basic validations
+- [ ] Validate the request with zod
+- [x] Validate if exists the pubkey
+- [ ] Save user on InstantDB
+
+#### Parameters: 
+```json
+{
+  "pubkey": <string>,
+}
+```
+
+## Dashboard
 
 ### Create a new event
 
@@ -16,6 +47,24 @@
   "tickets": <array of objects>,
 }
 ```
+
+### Get events
+
+`/api/event/getAll?pubkey=<pubkey>`
+
+- [ ] Validate the request with zod
+- [x] Return events from InstantDB
+
+## Manage
+
+### Get event
+
+`/api/event/get?id=<eventId>`
+
+- [ ] Validate the request with zod
+- [x] Return event from InstantDB
+
+## Check-out
 
 ### Create a new user
 
